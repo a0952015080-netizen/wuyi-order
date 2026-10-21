@@ -23,7 +23,6 @@
 
   <div class="max-w-md w-full bg-white rounded-2xl shadow-sm p-4 sm:p-5 border border-stone-200 my-auto">
 
-    <!-- 表頭標題 -->
     <div class="text-center mb-2.5">
       <h1 class="text-lg font-bold text-stone-800 flex items-center justify-center gap-1.5">
         <span>🎂</span> WUYI 蛋糕預訂小幫手
@@ -33,69 +32,6 @@
       </p>
     </div>
 
-    <!-- 送出成功後的畫面 -->
-    <div id="successOverlay" class="hidden text-center py-1 space-y-2.5">
-      <div class="text-4xl">🎉</div>
-      <h2 class="text-lg font-bold text-stone-800 leading-snug">
-        <span id="successTitle">成功建立！</span><br>
-        <span id="successSub" class="text-amber-700 text-sm font-semibold"></span>
-      </h2>
-
-      <!-- LIFF 直接送出成功提示 -->
-      <div id="sentBox" class="hidden p-2.5 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-800 text-left shadow-sm">
-        <div class="font-bold text-emerald-900">✓ 訂單已直接傳送給ＷＵＹＩ官方 LINE！</div>
-        <div class="text-[11px] text-emerald-700 mt-0.5">視窗即將關閉，請回聊天室傳送參考圖片。</div>
-      </div>
-
-      <!-- 備援（非 LINE 內開啟）提示 -->
-      <div id="fallbackBox" class="hidden space-y-2.5">
-        <div class="p-2.5 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-800 text-left shadow-sm">
-          <div class="font-bold text-emerald-900">✓ 訂單內容已自動為您複製！</div>
-          <div class="text-[11px] text-emerald-700 mt-0.5">
-            點擊下方綠色按鈕前往 LINE 對話框，按<strong>「傳送」</strong>即可！若沒有帶入，請<strong>「長按 ➔ 貼上」</strong>。
-          </div>
-        </div>
-        <button type="button" id="lineActionBtn" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-2.5 rounded-xl shadow transition duration-200 text-sm flex items-center justify-center gap-1.5">
-          <span>👉</span> 前往 ＷＵＹＩ LINE 對話框送出
-        </button>
-      </div>
-
-      <!-- 圖片提醒 -->
-      <div class="p-2 bg-rose-50 rounded-xl border border-rose-200 text-[11px] text-rose-900 text-left flex items-start gap-1.5 shadow-sm">
-        <span class="text-sm leading-none mt-0.5">📸</span>
-        <div class="leading-tight">
-          <strong>圖片提醒：</strong>請記得在聊天室傳送<strong>蛋糕造型參考圖（最多三款）</strong>方便報價喔！
-        </div>
-      </div>
-
-      <!-- 訂單明細預覽 -->
-      <div class="text-left space-y-1">
-        <div class="flex justify-between items-center text-[11px] text-stone-500 font-semibold">
-          <span>訂單明細核對：</span>
-          <span class="text-[10px] text-stone-400 font-normal">長按可全選</span>
-        </div>
-        <div id="orderPreviewBox" class="bg-stone-50 p-2.5 rounded-xl border border-stone-200 text-xs text-stone-700 whitespace-pre-wrap leading-relaxed select-all"></div>
-      </div>
-
-      <div>
-        <button type="button" id="copyOrderBtn" class="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium py-2 rounded-xl border border-stone-300 transition text-xs">
-          📋 複製訂單內容
-        </button>
-      </div>
-      <p id="copyHint" class="text-xs text-emerald-600 hidden font-medium">✓ 已成功複製訂單明細至剪貼簿！</p>
-
-      <div class="text-[11px] text-stone-500 text-center">
-        官方 LINE ID：<span class="font-mono text-stone-800 font-semibold">@230fpemy</span>
-      </div>
-
-      <div class="pt-0.5">
-        <button type="button" id="resetFormBtn" class="text-[11px] text-stone-400 hover:text-stone-600 underline">
-          填寫另一筆預約單
-        </button>
-      </div>
-    </div>
-
-    <!-- 表單本體 -->
     <form id="cakeOrderForm" class="space-y-2">
 
       <div class="grid grid-cols-2 gap-2">
@@ -216,6 +152,7 @@
   <script>
     const LIFF_ID = "2012143488-V8Xk20CM";
     const LINE_OA_ID = "@230fpemy";
+    const SUBMIT_TEXT = "送出訂單給ＷＵＹＩ官方LINE";
 
     const CLOSED_DATES = [
       "2026-10-24",
@@ -243,6 +180,9 @@
       "4. 焙茶戚風＋當季水果＋原味奶油"
     ];
 
+    const form = document.getElementById("cakeOrderForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const submitBtnText = document.getElementById("submitBtnText");
     const sizeSelect = document.getElementById("size");
     const flavorSelect = document.getElementById("flavor");
     const flavorHint = document.getElementById("flavorHint");
@@ -267,6 +207,13 @@
           }
         }).catch(() => { liffReady = false; })
       : Promise.resolve();
+
+    // 從 LINE 返回表單時，還原送出按鈕
+    function resetSubmitBtn() {
+      submitBtn.disabled = false;
+      submitBtnText.textContent = SUBMIT_TEXT;
+    }
+    window.addEventListener("pageshow", resetSubmitBtn);
 
     // 數字蠟燭展開/收合
     candleCheckbox.addEventListener("change", function() {
@@ -353,31 +300,7 @@
       }
     });
 
-    let currentOrderMessage = "";
-
-    function buildLineUrl() {
-      return `https://line.me/R/oaMessage/${LINE_OA_ID}/?${encodeURIComponent(currentOrderMessage)}`;
-    }
-
-    function copyOrder() {
-      if (navigator.clipboard && navigator.clipboard.writeText && currentOrderMessage) {
-        return navigator.clipboard.writeText(currentOrderMessage);
-      }
-      return Promise.reject();
-    }
-
-    function showSuccess(sentDirectly) {
-      document.getElementById("orderPreviewBox").textContent = currentOrderMessage;
-      document.getElementById("cakeOrderForm").classList.add("hidden");
-      document.getElementById("successOverlay").classList.remove("hidden");
-      document.getElementById("sentBox").classList.toggle("hidden", !sentDirectly);
-      document.getElementById("fallbackBox").classList.toggle("hidden", sentDirectly);
-      document.getElementById("successTitle").textContent = sentDirectly ? "訂單已送出！" : "成功建立！";
-      document.getElementById("successSub").textContent = sentDirectly ? "" : "請按下方按鈕送出訂單";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    document.getElementById("cakeOrderForm").addEventListener("submit", async function(e) {
+    form.addEventListener("submit", async function(e) {
       e.preventDefault();
 
       if (!this.checkValidity()) {
@@ -395,8 +318,8 @@
         cakeColor: document.getElementById("cakeColor").value.trim() || "無 / LINE討論",
         lettering: document.getElementById("lettering").value.trim() || "無",
         customNote: document.getElementById("customNote").value.trim() || "無",
-        size: document.getElementById("size").value,
-        flavor: document.getElementById("flavor").value,
+        size: sizeSelect.value,
+        flavor: flavorSelect.value,
         addons: addonsText,
         date: document.getElementById("date").value,
         time: document.getElementById("time").value,
@@ -406,7 +329,7 @@
         phone: document.getElementById("phone").value.trim()
       };
 
-      currentOrderMessage = 
+      const orderMessage = 
 `🎂【蛋糕訂購資訊】
 
 蛋糕體顏色：${orderData.cakeColor}
@@ -428,68 +351,25 @@
 
 📸 圖片提醒：已確認送出後傳送參考圖片報價`;
 
-      const submitBtn = document.getElementById("submitBtn");
       submitBtn.disabled = true;
-      document.getElementById("submitBtnText").textContent = "送出中...";
+      submitBtnText.textContent = "送出中...";
 
       await liffInitPromise;
 
-      // 🚀 方案一：LIFF 直接以客人身分傳訊息給官方 LINE
+      // 🚀 方案一：在 LINE 內開啟 → 直接以客人身分傳給官方 LINE，傳完關閉視窗
       if (liffReady && liff.isInClient()) {
         try {
-          await liff.sendMessages([{ type: "text", text: currentOrderMessage }]);
-          showSuccess(true);
-          setTimeout(() => { try { liff.closeWindow(); } catch (e) {} }, 2000);
+          await liff.sendMessages([{ type: "text", text: orderMessage }]);
+          liff.closeWindow();
           return;
         } catch (err) {
           // 傳送失敗則走備援
         }
       }
 
-      // 🔁 方案二（備援）：複製並開啟預填訊息的官方 LINE 連結
-      copyOrder().catch(() => {});
-      showSuccess(false);
-      submitBtn.disabled = false;
-      document.getElementById("submitBtnText").textContent = "送出訂單給ＷＵＹＩ官方LINE";
-      try {
-        window.location.href = buildLineUrl();
-      } catch (err) {}
-    });
-
-    // 備援：前往 LINE 按鈕
-    document.getElementById("lineActionBtn").addEventListener("click", function() {
-      copyOrder().catch(() => {});
-      window.location.href = buildLineUrl();
-    });
-
-    // 手動複製按鈕
-    document.getElementById("copyOrderBtn").addEventListener("click", function() {
-      copyOrder().then(() => {
-        const hint = document.getElementById("copyHint");
-        hint.classList.remove("hidden");
-        setTimeout(() => hint.classList.add("hidden"), 3000);
-      }).catch(() => {
-        alert("複製失敗，請手動長按選取下方文字複製！");
-      });
-    });
-
-    // 重新填寫
-    document.getElementById("resetFormBtn").addEventListener("click", async function() {
-      document.getElementById("cakeOrderForm").reset();
-      candleField.classList.add("hidden");
-      flavorSelect.innerHTML = '<option value="">請先選尺寸</option>';
-      flavorHint.classList.add("hidden");
-      document.getElementById("cakeOrderForm").classList.remove("hidden");
-      document.getElementById("successOverlay").classList.add("hidden");
-      document.getElementById("submitBtn").disabled = false;
-      document.getElementById("submitBtnText").textContent = "送出訂單給ＷＵＹＩ官方LINE";
-      if (liffReady && liff.isInClient()) {
-        try {
-          const profile = await liff.getProfile();
-          document.getElementById("lineName").value = profile.displayName;
-        } catch (e) {}
-      }
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      // 🔁 方案二（備援）：開啟官方 LINE 並預填訂單，客人按傳送即可
+      const lineUrl = `https://line.me/R/oaMessage/${LINE_OA_ID}/?${encodeURIComponent(orderMessage)}`;
+      window.location.href = lineUrl;
     });
   </script>
 </body>
