@@ -85,7 +85,7 @@
           <label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="2人餐具 $15" class="rounded" /> 2人餐具 $15</label>
           <label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="5人餐具 $30" class="rounded" /> 5人餐具 $30</label>
           <label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="10人餐具 $50" class="rounded" /> 10人餐具 $50</label>
-          <label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="生日插牌" class="rounded" /> 生日插牌</label>
+          <label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="生日插牌 / 造型蠟燭" class="rounded" /> 生日插牌 / 造型蠟燭</label>
           <label class="flex items-center gap-1.5"><input type="checkbox" id="candleCheckbox" name="addons" value="數字蠟燭 $30/支" class="rounded" /> 數字蠟燭 $30/支</label>
           <label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="保冰袋/劑 $100" class="rounded" /> 保冰袋/劑 $100</label>
           <label class="flex items-center gap-1.5 col-span-2"><input type="checkbox" id="noAddonsCheckbox" name="addons" value="無" class="rounded" /> 無加購</label>
@@ -123,7 +123,8 @@
 
       <!-- 提前預訂防呆與地點 -->
       <div class="p-2 bg-amber-50 rounded-lg border border-amber-200 text-[11px] text-amber-800 space-y-0.5">
-        <div>⏳ <strong>預訂須知：</strong>手作新鮮蛋糕<strong id="preorderDaysNotice">需提前 3 天預約</strong>（每日 18:00 截單；週一固定公休）。</div>
+        <div>⏳ <strong>預訂須知：</strong>手作新鮮蛋糕<strong id="preorderDaysNotice">需提前 3 天預約</strong></div>
+        <div class="pl-4 text-[10px] text-amber-700">（每日 18:00 截單；週一固定公休）</div>
         <div>📍 <strong>自取地點：</strong>台南市中西區友愛街93號</div>
       </div>
 
@@ -157,12 +158,12 @@
       <div class="space-y-2 p-2.5 bg-stone-50 rounded-xl border border-stone-200">
         <div>
           <label class="block text-[11px] font-semibold text-stone-700 mb-0.5">想要的蛋糕體顏色（選填）</label>
-          <input type="text" id="cakeColor" maxlength="20" placeholder="例如：淡粉色、米黃色（或LINE討論）" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs bg-white" />
+          <input type="text" id="cakeColor" maxlength="30" placeholder="例如：藍 粉 黃 紫 灰(或Line討論)" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs bg-white" />
         </div>
 
         <div>
           <label class="block text-[11px] font-semibold text-stone-700 mb-0.5">英文題字內容（選填，限英文最多2-3字）</label>
-          <input type="text" id="lettering" maxlength="25" placeholder="例如：HBD、Happy Day（無中文題字）" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs bg-white" />
+          <input type="text" id="lettering" maxlength="30" placeholder="例如：Happy Birthday HBD" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs bg-white" />
         </div>
 
         <div>
