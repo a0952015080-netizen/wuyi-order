@@ -268,13 +268,23 @@
       <!-- 操作按鈕 -->
       <div class="pt-1 space-y-2">
         <button type="button" onclick="saveAdminSettings()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
-          💾 儲存設定並立即生效
+          💾 儲存設定（本機生效）
         </button>
-        <div class="flex justify-between items-center text-xs px-1">
+
+        <button type="button" onclick="copySyncShareLink()" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-2.5 rounded-xl text-xs shadow transition flex items-center justify-center gap-1.5">
+          <span>📲</span> 複製全客人生效連結（放 LINE 圖文選單）
+        </button>
+
+        <div class="bg-amber-50 p-2.5 rounded-lg border border-amber-200 text-[11px] text-amber-900 leading-relaxed">
+          💡 <strong>跨手機同步說明：</strong><br>
+          靜態網頁無後端伺服器，若要讓<strong>所有客人的手機</strong>都能看到最新日期，請點上方【複製全客人生效連結】，並貼至 LINE 官方帳號的圖文選單（客人點擊即可自動同步最新休假）。或直接告訴 AI 助理您要公休的日期，幫您永久寫入代碼推送到 GitHub！
+        </div>
+
+        <div class="flex justify-between items-center text-xs px-1 pt-1">
           <button type="button" onclick="resetToDefaultSettings()" class="text-stone-400 hover:text-stone-600 underline">
             恢復原廠預設設定
           </button>
-          <span class="text-stone-400 text-[11px]">設定將保存在此瀏覽器</span>
+          <span class="text-stone-400 text-[11px]">本機設定保存在此裝置</span>
         </div>
       </div>
 
@@ -296,6 +306,23 @@
     };
 
     function loadConfig() {
+      // 1. 優先從網址 URL 參數讀取（跨手機同步）
+      const urlParams = new URLSearchParams(window.location.search);
+      const cfgParam = urlParams.get('cfg');
+      if (cfgParam) {
+        try {
+          const jsonStr = decodeURIComponent(escape(atob(cfgParam)));
+          const parsed = JSON.parse(jsonStr);
+          const merged = { ...DEFAULT_CONFIG, ...parsed };
+          // 同步存入此裝置的 localStorage，之後開啟原網址也有效
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+          return merged;
+        } catch (e) {
+          console.warn("解析網址設定失敗", e);
+        }
+      }
+
+      // 2. 從本機 LocalStorage 讀取
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
@@ -526,7 +553,34 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(currentConfig));
       initFlatpickr();
       closeAdminConfigModal();
-      alert("✅ 預訂日期設定已成功更新並生效！");
+      alert("✅ 預訂日期設定已在本機成功更新並生效！\n\n💡 提醒：若要讓所有客人的手機也同步更新，請在管理面板點擊【複製全客人生效連結】並貼到 LINE 官方帳號的圖文選單。");
+    }
+
+    // 產生並複製跨手機同步連結
+    function copySyncShareLink() {
+      const days = parseInt(document.getElementById("cfgPreorderDays").value, 10);
+      currentConfig.preorderDays = isNaN(days) || days < 0 ? 0 : days;
+      currentConfig.after18Plus1 = document.getElementById("cfgAfter18Plus1").checked;
+      currentConfig.blockMonday = document.getElementById("cfgBlockMonday").checked;
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(currentConfig));
+      initFlatpickr();
+
+      const jsonStr = JSON.stringify(currentConfig);
+      const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+      
+      const baseUrl = window.location.origin + window.location.pathname;
+      const shareUrl = `${baseUrl}?cfg=${encoded}`;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          alert("📋 已成功複製【全客人生效連結】！\n\n👉 請將此連結更新至 LINE 官方帳號的「圖文選單」或傳給客人，任何手機點擊開啟，都會立即自動同步最新日期！");
+        }).catch(() => {
+          prompt("請長按複製以下全客人生效連結：", shareUrl);
+        });
+      } else {
+        prompt("請長按複製以下全客人生效連結：", shareUrl);
+      }
     }
 
     // 恢復預設
