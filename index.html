@@ -3,65 +3,110 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>🎂 WUYI 蛋糕預訂小幫手</title>
+  <base target="_blank">
+  <title>🎂 WUYI 蛋糕訂購預訂單</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Flatpickr 日曆 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <!-- LINE LIFF SDK -->
-  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    * { box-sizing: border-box; }
+    /* 防止 iPhone 點擊輸入框自動放大 */
+    input, select, textarea {
+      font-size: 16px !important;
+    }
     .flatpickr-day.selected { background: #d97706 !important; border-color: #d97706 !important; }
     .flatpickr-day.today { border-color: #d97706 !important; }
-    input, select, textarea { font-size: 16px !important; }
-    @media (min-width: 640px) {
-      input, select, textarea { font-size: 14px !important; }
-    }
   </style>
 </head>
-<body class="bg-[#FBF9F5] text-stone-800 p-2 sm:p-4 min-h-screen flex justify-center items-center font-sans">
-
-  <div class="max-w-md w-full bg-white rounded-2xl shadow-sm p-4 sm:p-5 border border-stone-200 my-auto">
-
-    <div class="text-center mb-2.5">
-      <h1 class="text-lg font-bold text-stone-800 flex items-center justify-center gap-1.5">
-        <span>🎂</span> WUYI 蛋糕預訂小幫手
+<body class="bg-[#FBF9F5] text-stone-800 p-2 sm:p-4 min-h-screen flex justify-center items-start font-sans">
+  
+  <div class="max-w-md w-full bg-white rounded-2xl shadow-sm p-4 sm:p-5 border border-stone-200 my-2">
+    
+    <!-- 表頭標題（蛋糕圖案可點擊觸發管理員設定） -->
+    <div class="text-center mb-3">
+      <h1 class="text-lg font-bold text-stone-800 flex items-center justify-center gap-1.5 select-none">
+        <span id="adminCakeBtn" class="cursor-pointer hover:scale-125 active:scale-95 transition-transform duration-150 inline-block" title="店長管理模式（點擊輸入密碼）">🎂</span>
+        <span>WUYI 蛋糕訂購預訂單</span>
       </h1>
-      <p class="text-[11px] text-amber-800 bg-amber-50 py-0.5 px-3 rounded-full inline-block mt-1 font-medium border border-amber-200">
-        填寫完成按送出，訂單會直接傳給ＷＵＹＩ客服
-      </p>
+      <p class="text-[11px] text-stone-500">填妥後將自動前往 LINE 官方私訊，由客服為您報價確認</p>
     </div>
 
-    <form id="cakeOrderForm" class="space-y-2">
-
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="block text-xs font-semibold mb-0.5 text-stone-700">尺寸 <span class="text-red-500">*</span></label>
-          <select id="size" required class="w-full border border-stone-300 rounded-lg p-2 text-xs bg-white outline-none focus:border-stone-600">
-            <option value="">選擇尺寸</option>
-            <option value="漢堡盒 (4吋一層夾餡)">漢堡盒 4吋 (1~2人)</option>
-            <option value="4 吋整模 (兩層夾餡)">4 吋整模 (2~3人)</option>
-            <option value="6 吋整模 (兩層夾餡)">6 吋整模 (4~6人)</option>
-            <option value="8 吋整模 (兩層夾餡)">8 吋整模 (8~10人)</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold mb-0.5 text-stone-700">口味 <span class="text-red-500">*</span></label>
-          <select id="flavor" required class="w-full border border-stone-300 rounded-lg p-2 text-xs bg-white outline-none focus:border-stone-600 truncate">
-            <option value="">請先選尺寸</option>
-          </select>
-        </div>
-        <div id="flavorHint" class="hidden col-span-2 text-[11px] text-amber-700"></div>
+    <!-- 送出成功後的覆蓋畫面（加強防漏單警告） -->
+    <div id="successOverlay" class="hidden text-center py-5 space-y-3">
+      <div class="text-4xl animate-bounce">📱</div>
+      <h2 class="text-lg font-bold text-stone-800">正在為您開啟 LINE 客服...</h2>
+      
+      <!-- ⚠️ 關鍵防呆：提醒客人一定要按發送 -->
+      <div class="bg-rose-50 border-2 border-rose-300 rounded-xl p-3 text-left">
+        <p class="text-xs font-bold text-rose-700 flex items-center gap-1 mb-1">
+          <span>⚠️</span> 重要最後一步（請勿漏掉）：
+        </p>
+        <p class="text-[11px] text-rose-600 leading-relaxed">
+          1. 進入 LINE 聊天室後，<strong>務必按下對話框右下角的【傳送鍵】</strong>，我們才收得到訂單喔！<br>
+          2. 傳送後，請記得隨手<strong>上傳蛋糕參考圖片</strong>方便我們報價。
+        </p>
       </div>
 
+      <div class="pt-1">
+        <a id="lineManualBtn" href="#" target="_blank" rel="noopener noreferrer" class="inline-block w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-3.5 rounded-xl shadow transition duration-200 text-sm">
+          👉 若未自動跳轉，請點此開啟 LINE
+        </a>
+      </div>
+    </div>
+
+    <!-- 一頁式表單本體 -->
+    <form id="cakeOrderForm" class="space-y-2.5">
+      
+      <!-- 1. 尺寸與口味並排 -->
       <div class="grid grid-cols-2 gap-2">
         <div>
-          <label class="block text-xs font-semibold mb-0.5 text-stone-700">取貨日期 <span class="text-red-500">*</span></label>
-          <input type="text" id="date" placeholder="點擊選日期" required readonly class="w-full border border-stone-300 rounded-lg p-2 text-xs bg-white cursor-pointer outline-none focus:border-stone-600" />
+          <label class="block text-xs font-semibold mb-1 text-stone-700">蛋糕尺寸 <span class="text-red-500">*</span></label>
+          <select id="size" required class="w-full border border-stone-300 rounded-lg p-2 bg-white outline-none focus:border-stone-600 text-xs">
+            <option value="">選擇尺寸</option>
+            <option value="漢堡盒 (4吋一層夾餡)">漢堡盒 (4吋一層)</option>
+            <option value="4 吋整模 (兩層夾餡)">4 吋整模 (兩層)</option>
+            <option value="6 吋整模 (兩層夾餡)">6 吋整模 (兩層)</option>
+            <option value="8 吋整模 (兩層夾餡)">8 吋整模 (兩層)</option>
+          </select>
         </div>
         <div>
-          <label class="block text-xs font-semibold mb-0.5 text-stone-700">取貨時間 <span class="text-red-500">*</span></label>
-          <select id="time" required class="w-full border border-stone-300 rounded-lg p-2 text-xs bg-white outline-none focus:border-stone-600">
+          <label class="block text-xs font-semibold mb-1 text-stone-700">蛋糕口味 <span class="text-red-500">*</span></label>
+          <select id="flavor" required class="w-full border border-stone-300 rounded-lg p-2 bg-white outline-none focus:border-stone-600 text-xs">
+            <option value="">先選尺寸</option>
+          </select>
+        </div>
+      </div>
+      <p id="flavorHint" class="text-[10px] text-amber-700 hidden"></p>
+
+      <!-- 2. 需加購項目（已加入互斥防呆） -->
+      <div>
+        <label class="block text-xs font-semibold mb-1 text-stone-700">需加購（可複選）</label>
+        <div class="grid grid-cols-2 gap-1.5 text-xs text-stone-600 bg-stone-50 p-2 rounded-xl border border-stone-200">
+          <label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="2人餐具 $15" class="rounded" /> 2人餐具 $15</label>
+          <label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="5人餐具 $30" class="rounded" /> 5人餐具 $30</label>
+          <label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="10人餐具 $50" class="rounded" /> 10人餐具 $50</label>
+          <label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="生日插牌" class="rounded" /> 生日插牌</label>
+          <label class="flex items-center gap-1.5"><input type="checkbox" id="candleCheckbox" name="addons" value="數字蠟燭 $30/支" class="rounded" /> 數字蠟燭 $30/支</label>
+          <label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="保冰袋/劑 $100" class="rounded" /> 保冰袋/劑 $100</label>
+          <label class="flex items-center gap-1.5 col-span-2"><input type="checkbox" id="noAddonsCheckbox" name="addons" value="無" class="rounded" /> 無加購</label>
+        </div>
+
+        <!-- 數字蠟燭歲數欄 -->
+        <div id="candleField" class="hidden mt-1 p-2 bg-amber-50 rounded-lg border border-amber-200">
+          <label class="block text-[11px] font-semibold text-amber-900 mb-0.5">🕯️ 數字蠟燭歲數（必填歲數或填問號）：<span class="text-red-500">*</span></label>
+          <input type="text" id="candleDetail" placeholder="例如：28 歲、數字 8、或問號" class="w-full border border-amber-300 rounded p-1.5 bg-white outline-none text-xs" />
+        </div>
+      </div>
+
+      <!-- 3. 取貨日期與時間並排 -->
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-stone-700">取貨日期 <span class="text-red-500">*</span></label>
+          <input type="text" id="date" placeholder="點擊選擇日期" required readonly class="w-full border border-stone-300 rounded-lg p-2 bg-white cursor-pointer outline-none focus:border-stone-600 text-xs" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-stone-700">取貨時間 <span class="text-red-500">*</span></label>
+          <select id="time" required class="w-full border border-stone-300 rounded-lg p-2 bg-white outline-none focus:border-stone-600 text-xs">
             <option value="">選擇時間</option>
             <option value="15:00">15:00</option>
             <option value="15:30">15:30</option>
@@ -76,94 +121,407 @@
         </div>
       </div>
 
-      <div class="p-2 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900 space-y-0.5 leading-tight">
-        <div>⏳ <strong>預訂須知：</strong>手作新鮮蛋糕<strong>建議提前一週預訂</strong>。</div>
-        <div>📅 <strong>店休時間：</strong>每週一固定公休；週二為不定期公休。</div>
+      <!-- 提前預訂防呆與地點 -->
+      <div class="p-2 bg-amber-50 rounded-lg border border-amber-200 text-[11px] text-amber-800 space-y-0.5">
+        <div>⏳ <strong>預訂須知：</strong>手作新鮮蛋糕<strong id="preorderDaysNotice">需提前 3 天預約</strong>（每日 18:00 截單；週一固定公休）。</div>
         <div>📍 <strong>自取地點：</strong>台南市中西區友愛街93號</div>
       </div>
 
-      <div>
-        <label class="block text-xs font-semibold mb-0.5 text-stone-700">需加購（可複選）</label>
-        <div class="grid grid-cols-3 gap-1 text-[11px] text-stone-700 bg-stone-50 p-2 rounded-xl border border-stone-200">
-          <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="addons" value="2人餐具 $15" class="rounded text-stone-800 w-3.5 h-3.5" /> 2人餐具$15</label>
-          <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="addons" value="5人餐具 $30" class="rounded text-stone-800 w-3.5 h-3.5" /> 5人餐具$30</label>
-          <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="addons" value="10人餐具 $50" class="rounded text-stone-800 w-3.5 h-3.5" /> 10人餐具$50</label>
-          <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="addons" value="生日插牌/蠟燭" class="rounded text-stone-800 w-3.5 h-3.5" /> 插牌/蠟燭</label>
-          <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" id="candleCheckbox" name="addons" value="數字蠟燭 $30/支" class="rounded text-stone-800 w-3.5 h-3.5" /> 數字蠟燭$30</label>
-          <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="addons" value="保冰袋/劑 $100" class="rounded text-stone-800 w-3.5 h-3.5" /> 保冰袋$100</label>
-          <label class="flex items-center gap-1 cursor-pointer col-span-3 text-stone-500 pt-1 border-t border-stone-200"><input type="checkbox" id="noAddonCheckbox" name="addons" value="無" class="rounded text-stone-800 w-3.5 h-3.5" /> 無加購需求</label>
-        </div>
-
-        <div id="candleField" class="hidden mt-1 p-1.5 bg-amber-50 rounded-lg border border-amber-200">
-          <input type="text" id="candleDetail" placeholder="請填寫數字蠟燭歲數（例如：28歲）" class="w-full border border-amber-300 rounded-lg p-1.5 text-xs bg-white outline-none" />
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-2">
+      <!-- 4. 訂購人資訊（加強手機格式防呆） -->
+      <div class="space-y-2 pt-1 border-t border-stone-100">
         <div>
-          <label class="block text-xs font-semibold mb-0.5 text-stone-700">LINE 暱稱 <span class="text-red-500">*</span></label>
-          <input type="text" id="lineName" required placeholder="LINE顯示名稱" class="w-full border border-stone-300 rounded-lg p-2 text-xs outline-none focus:border-stone-600" />
+          <label class="block text-xs font-semibold mb-0.5 text-stone-700">訂購人 LINE 名稱 <span class="text-red-500">*</span></label>
+          <input type="text" id="lineName" required placeholder="請填寫您 LINE 的顯示暱稱" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs" />
         </div>
-        <div>
-          <label class="block text-xs font-semibold mb-0.5 text-stone-700">姓名 <span class="text-red-500">*</span></label>
-          <input type="text" id="name" required placeholder="訂購人姓名" class="w-full border border-stone-300 rounded-lg p-2 text-xs outline-none focus:border-stone-600" />
-        </div>
-        <div class="col-span-2">
-          <label class="block text-xs font-semibold mb-0.5 text-stone-700">電話 <span class="text-red-500">*</span></label>
-          <input type="tel" id="phone" required placeholder="例如：0912345678" class="w-full border border-stone-300 rounded-lg p-2 text-xs outline-none focus:border-stone-600" />
-        </div>
-      </div>
-
-      <div class="p-2 bg-stone-50 rounded-xl border border-stone-200 space-y-1">
-        <div class="text-[11px] font-semibold text-stone-600">🎨 選填客製需求</div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-[10px] text-stone-500 mb-0.5">蛋糕體顏色</label>
-            <input type="text" id="cakeColor" placeholder="例如：淡粉色、米黃色" class="w-full border border-stone-300 rounded-lg p-1.5 text-xs bg-white outline-none focus:border-stone-600" />
+            <label class="block text-xs font-semibold mb-0.5 text-stone-700">訂購人姓名 <span class="text-red-500">*</span></label>
+            <input type="text" id="name" required placeholder="王小明" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs" />
           </div>
           <div>
-            <label class="block text-[10px] text-stone-500 mb-0.5">英文題字（限2~3單字/無中文）</label>
-            <input type="text" id="lettering" placeholder="例：Happy Birthday" class="w-full border border-stone-300 rounded-lg p-1.5 text-xs bg-white outline-none focus:border-stone-600" />
+            <label class="block text-xs font-semibold mb-0.5 text-stone-700">訂購人電話 <span class="text-red-500">*</span></label>
+            <input type="tel" id="phone" required placeholder="0912345678" maxlength="11" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs" />
           </div>
-        </div>
-        <div>
-          <label class="block text-[10px] text-stone-500 mb-0.5">其他客製備註</label>
-          <input type="text" id="customNote" placeholder="如有其他特殊小細節可填寫" class="w-full border border-stone-300 rounded-lg p-1.5 text-xs bg-white outline-none focus:border-stone-600" />
         </div>
       </div>
 
-      <div class="p-2 bg-rose-50 rounded-xl border border-rose-200">
-        <label class="flex items-start gap-1.5 cursor-pointer text-[11px] text-rose-900 leading-tight font-medium">
-          <input type="checkbox" id="photoConfirm" required class="mt-0.5 rounded text-rose-600 focus:ring-rose-500 w-3.5 h-3.5 flex-shrink-0" />
-          <span>我已了解：送出後請於 LINE 傳送<strong>蛋糕造型參考圖（最多3款）</strong>方便報價 <span class="text-red-500">*</span></span>
+      <!-- 圖片提醒打勾（必勾選） -->
+      <div class="p-2.5 bg-rose-50 rounded-xl border border-rose-200">
+        <label class="flex items-start gap-2 cursor-pointer text-xs text-rose-900 font-medium">
+          <input type="checkbox" id="photoConfirm" required class="mt-0.5 rounded text-rose-600 w-4 h-4" />
+          <span>我已了解：送出訂單後，請在 LINE 聊天室<strong>傳送參考圖片最多三款</strong>以利報價 <span class="text-red-500">*</span></span>
         </label>
       </div>
 
-      <div class="pt-0.5">
-        <button type="submit" id="submitBtn" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-2.5 rounded-xl shadow transition duration-200 flex items-center justify-center gap-1.5 text-sm disabled:opacity-60">
-          <span>🎂</span>
-          <span id="submitBtnText">送出訂單給ＷＵＹＩ官方LINE</span>
+      <!-- 5. 三個選填客製項目（加上字數限制防呆） -->
+      <div class="space-y-2 p-2.5 bg-stone-50 rounded-xl border border-stone-200">
+        <div>
+          <label class="block text-[11px] font-semibold text-stone-700 mb-0.5">想要的蛋糕體顏色（選填）</label>
+          <input type="text" id="cakeColor" maxlength="20" placeholder="例如：淡粉色、米黃色（或LINE討論）" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs bg-white" />
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-semibold text-stone-700 mb-0.5">英文題字內容（選填，限英文最多2-3字）</label>
+          <input type="text" id="lettering" maxlength="25" placeholder="例如：HBD、Happy Day（無中文題字）" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs bg-white" />
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-semibold text-stone-700 mb-0.5">其他客製需求（選填）</label>
+          <input type="text" id="customNote" maxlength="50" placeholder="如有其他特殊小細節可在此填寫" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs bg-white" />
+        </div>
+      </div>
+
+      <!-- 6. 送出按鈕 -->
+      <div class="pt-1">
+        <button type="submit" id="submitBtn" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-3 rounded-xl shadow transition duration-200 flex items-center justify-center gap-1.5 text-sm">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.035 9.608.391.082.922.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975 1.766-1.972 2.548-3.957 2.548-5.968z"/></svg>
+          透過 LINE 送出訂單
         </button>
       </div>
 
     </form>
   </div>
 
+  <!-- ================= 管理員後台彈窗（點擊蛋糕圖案觸發） ================= -->
+  <!-- 1. 密碼驗證彈窗 -->
+  <div id="adminPasswordModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-xs w-full p-5 shadow-2xl border border-stone-200 text-center animate-fade-in">
+      <div class="text-3xl mb-2">🔐</div>
+      <h3 class="text-base font-bold text-stone-800 mb-1">店長管理模式</h3>
+      <p class="text-xs text-stone-500 mb-3">請輸入管理密碼進入日期設定</p>
+      
+      <form id="adminLoginForm" onsubmit="event.preventDefault(); verifyAdminPassword();">
+        <input type="password" id="adminPasswordInput" placeholder="請輸入 4 位密碼" class="w-full border border-stone-300 rounded-lg p-2 text-center text-sm outline-none focus:border-amber-600 mb-2 font-mono tracking-widest" autofocus />
+        <p id="passwordError" class="text-xs text-rose-600 mb-3 hidden">⚠️ 密碼錯誤，請重新輸入！</p>
+        
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" onclick="closeAdminPasswordModal()" class="w-full py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold rounded-lg transition">取消</button>
+          <button type="submit" class="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg transition">確認進入</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. 日期管理設定主面板 -->
+  <div id="adminConfigModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-3 z-50 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-md w-full p-4 sm:p-5 shadow-2xl border border-stone-200 space-y-4 my-auto max-h-[92vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between border-b pb-2">
+        <div class="flex items-center gap-1.5">
+          <span class="text-lg">⚙️</span>
+          <h3 class="text-sm font-bold text-stone-800">可預訂日期管理設定</h3>
+        </div>
+        <button type="button" onclick="closeAdminConfigModal()" class="text-stone-400 hover:text-stone-700 text-base font-bold px-1">✕</button>
+      </div>
+
+      <!-- 設定區塊 1：提前預訂天數 -->
+      <div class="bg-stone-50 p-3 rounded-xl border border-stone-200 space-y-2">
+        <label class="block text-xs font-bold text-stone-700">⏳ 提前預約天數設定</label>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-stone-600">至少需提前：</span>
+          <input type="number" id="cfgPreorderDays" min="0" max="30" class="w-16 border border-stone-300 rounded p-1 text-center text-xs font-bold bg-white" />
+          <span class="text-xs text-stone-600">天預訂</span>
+        </div>
+        <label class="flex items-center gap-2 text-xs text-stone-600 cursor-pointer pt-1">
+          <input type="checkbox" id="cfgAfter18Plus1" class="rounded text-amber-600" />
+          <span>每日超過 18:00 自動再延後 1 天（視為隔天起算）</span>
+        </label>
+        <label class="flex items-center gap-2 text-xs text-stone-600 cursor-pointer">
+          <input type="checkbox" id="cfgBlockMonday" class="rounded text-amber-600" />
+          <span>固定每週一公休不可選</span>
+        </label>
+      </div>
+
+      <!-- 設定區塊 2：額外休假日/滿單不可預訂日（CLOSED DATES） -->
+      <div class="bg-rose-50/70 p-3 rounded-xl border border-rose-200 space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="block text-xs font-bold text-rose-800">🚫 特別公休 / 額滿不可預約日</label>
+          <span class="text-[10px] text-rose-600">點擊標籤可移除</span>
+        </div>
+        <div class="flex gap-2">
+          <input type="date" id="addClosedDateInput" class="flex-1 border border-rose-300 rounded-lg p-1.5 text-xs bg-white outline-none" />
+          <button type="button" onclick="addClosedDate()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg whitespace-nowrap">＋ 新增休假</button>
+        </div>
+        <!-- 已設定的休假標籤列表 -->
+        <div id="closedDateList" class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-white/70 rounded-lg border border-rose-100 min-h-[32px] items-center">
+          <!-- 動態生成 -->
+        </div>
+      </div>
+
+      <!-- 設定區塊 3：特例開放日（覆蓋週一或常規公休） -->
+      <div class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200 space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="block text-xs font-bold text-emerald-800">✨ 特別開放預訂日（急單/特例接單）</label>
+          <span class="text-[10px] text-emerald-600">即使逢週一也能預約</span>
+        </div>
+        <div class="flex gap-2">
+          <input type="date" id="addSpecialOpenInput" class="flex-1 border border-emerald-300 rounded-lg p-1.5 text-xs bg-white outline-none" />
+          <button type="button" onclick="addSpecialOpenDate()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg whitespace-nowrap">＋ 特例開放</button>
+        </div>
+        <!-- 已設定的特例開放標籤列表 -->
+        <div id="specialOpenList" class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-white/70 rounded-lg border border-emerald-100 min-h-[32px] items-center">
+          <!-- 動態生成 -->
+        </div>
+      </div>
+
+      <!-- 操作按鈕 -->
+      <div class="pt-1 space-y-2">
+        <button type="button" onclick="saveAdminSettings()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
+          💾 儲存設定並立即生效
+        </button>
+        <div class="flex justify-between items-center text-xs px-1">
+          <button type="button" onclick="resetToDefaultSettings()" class="text-stone-400 hover:text-stone-600 underline">
+            恢復原廠預設設定
+          </button>
+          <span class="text-stone-400 text-[11px]">設定將保存在此瀏覽器</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <script>
-    const LIFF_ID = "2012143488-V8Xk20CM";
     const LINE_OA_ID = "@230fpemy";
-    const SUBMIT_TEXT = "送出訂單給ＷＵＹＩ官方LINE";
+    
+    // ================= 日期管理系統預設值與本地儲存 =================
+    const STORAGE_KEY = "wuyi_order_date_config_v1";
 
-    const CLOSED_DATES = [
-      "2026-10-24",
-      "2026-10-25",
-      "2026-10-27",
-      "2026-11-24",
-      "2026-12-01"
-    ];
+    const DEFAULT_CONFIG = {
+      preorderDays: 3,
+      after18Plus1: true,
+      blockMonday: true,
+      closedDates: ["2026-10-27", "2026-11-24", "2026-12-01"],
+      specialOpenDates: []
+    };
 
-    const PREORDER_DAYS = 3;
+    function loadConfig() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          return { ...DEFAULT_CONFIG, ...parsed };
+        }
+      } catch (e) {
+        console.error("載入設定錯誤", e);
+      }
+      return { ...DEFAULT_CONFIG };
+    }
 
+    let currentConfig = loadConfig();
+    let flatpickrInstance = null;
+
+    const formatYMD = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+    // 初始化/重新載入 Flatpickr
+    function initFlatpickr() {
+      if (flatpickrInstance) {
+        flatpickrInstance.destroy();
+      }
+
+      // 計算最早可預約天數
+      let days = Number(currentConfig.preorderDays);
+      if (isNaN(days) || days < 0) days = 0;
+
+      const now = new Date();
+      if (currentConfig.after18Plus1 && now.getHours() >= 18) {
+        days += 1;
+      }
+
+      const minBookingDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + days);
+      const lastDayOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+
+      // 更新頁面上的預訂須知文字
+      const noticeEl = document.getElementById("preorderDaysNotice");
+      if (noticeEl) {
+        noticeEl.innerText = `需提前 ${currentConfig.preorderDays} 天預約`;
+      }
+
+      flatpickrInstance = flatpickr("#date", {
+        locale: {
+          firstDayOfWeek: 0,
+          weekdays: { shorthand: ["日", "一", "二", "三", "四", "五", "六"], longhand: ["週日", "週一", "週二", "週三", "週四", "週五", "週六"] },
+          months: { shorthand: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"], longhand: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"] }
+        },
+        minDate: formatYMD(minBookingDate),
+        maxDate: formatYMD(lastDayOfNextMonth),
+        dateFormat: "Y-m-d",
+        disable: [
+          function(date) {
+            const dateStr = formatYMD(date);
+
+            // 1. 特例開放日優先（即使是週一也能訂）
+            if (currentConfig.specialOpenDates && currentConfig.specialOpenDates.includes(dateStr)) {
+              return false;
+            }
+
+            // 2. 特別公休日/額滿日阻擋
+            if (currentConfig.closedDates && currentConfig.closedDates.includes(dateStr)) {
+              return true;
+            }
+
+            // 3. 週一公休阻擋
+            if (currentConfig.blockMonday && date.getDay() === 1) {
+              return true;
+            }
+
+            return false;
+          }
+        ]
+      });
+    }
+
+    // ================= 後台管理模式（密碼 5151） =================
+    const adminCakeBtn = document.getElementById("adminCakeBtn");
+    const adminPasswordModal = document.getElementById("adminPasswordModal");
+    const adminPasswordInput = document.getElementById("adminPasswordInput");
+    const passwordError = document.getElementById("passwordError");
+    const adminConfigModal = document.getElementById("adminConfigModal");
+
+    // 點擊蛋糕圖案
+    adminCakeBtn.addEventListener("click", () => {
+      adminPasswordModal.classList.remove("hidden");
+      adminPasswordInput.value = "";
+      passwordError.classList.add("hidden");
+      setTimeout(() => adminPasswordInput.focus(), 100);
+    });
+
+    function closeAdminPasswordModal() {
+      adminPasswordModal.classList.add("hidden");
+    }
+
+    // 全形轉半形工具
+    function toHalfWidth(str) {
+      return str.replace(/[\uff01-\uff5e]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0xfee0)).trim();
+    }
+
+    // 驗證密碼（支援全形 ５１５１ 或半形 5151）
+    function verifyAdminPassword() {
+      const inputVal = toHalfWidth(adminPasswordInput.value);
+      if (inputVal === "5151") {
+        closeAdminPasswordModal();
+        openAdminConfigModal();
+      } else {
+        passwordError.classList.remove("hidden");
+        adminPasswordInput.select();
+      }
+    }
+
+    // 開啟管理設定面板
+    function openAdminConfigModal() {
+      document.getElementById("cfgPreorderDays").value = currentConfig.preorderDays;
+      document.getElementById("cfgAfter18Plus1").checked = !!currentConfig.after18Plus1;
+      document.getElementById("cfgBlockMonday").checked = !!currentConfig.blockMonday;
+      renderClosedDateTags();
+      renderSpecialOpenTags();
+      adminConfigModal.classList.remove("hidden");
+    }
+
+    function closeAdminConfigModal() {
+      adminConfigModal.classList.add("hidden");
+    }
+
+    // 渲染休假標籤
+    function renderClosedDateTags() {
+      const container = document.getElementById("closedDateList");
+      container.innerHTML = "";
+      if (!currentConfig.closedDates || currentConfig.closedDates.length === 0) {
+        container.innerHTML = `<span class="text-[11px] text-stone-400">目前無額外休假日</span>`;
+        return;
+      }
+      currentConfig.closedDates.sort().forEach((d) => {
+        const badge = document.createElement("span");
+        badge.className = "inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] bg-rose-100 text-rose-800 border border-rose-200";
+        badge.innerHTML = `<span>${d}</span> <button type="button" onclick="removeClosedDate('${d}')" class="text-rose-500 hover:text-rose-800 font-bold ml-0.5">✕</button>`;
+        container.appendChild(badge);
+      });
+    }
+
+    function addClosedDate() {
+      const input = document.getElementById("addClosedDateInput");
+      const val = input.value;
+      if (!val) {
+        alert("請選擇要休假的日期！");
+        return;
+      }
+      if (!currentConfig.closedDates.includes(val)) {
+        currentConfig.closedDates.push(val);
+        // 如果原本在特例開放中，自動移除
+        currentConfig.specialOpenDates = (currentConfig.specialOpenDates || []).filter(item => item !== val);
+        renderClosedDateTags();
+        renderSpecialOpenTags();
+      }
+      input.value = "";
+    }
+
+    function removeClosedDate(dateStr) {
+      currentConfig.closedDates = currentConfig.closedDates.filter(d => d !== dateStr);
+      renderClosedDateTags();
+    }
+
+    // 渲染特例開放標籤
+    function renderSpecialOpenTags() {
+      const container = document.getElementById("specialOpenList");
+      container.innerHTML = "";
+      if (!currentConfig.specialOpenDates || currentConfig.specialOpenDates.length === 0) {
+        container.innerHTML = `<span class="text-[11px] text-stone-400">目前無特例開放日</span>`;
+        return;
+      }
+      currentConfig.specialOpenDates.sort().forEach((d) => {
+        const badge = document.createElement("span");
+        badge.className = "inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-200";
+        badge.innerHTML = `<span>${d}</span> <button type="button" onclick="removeSpecialOpenDate('${d}')" class="text-emerald-500 hover:text-emerald-800 font-bold ml-0.5">✕</button>`;
+        container.appendChild(badge);
+      });
+    }
+
+    function addSpecialOpenDate() {
+      const input = document.getElementById("addSpecialOpenInput");
+      const val = input.value;
+      if (!val) {
+        alert("請選擇要特例開放的日期！");
+        return;
+      }
+      if (!currentConfig.specialOpenDates) currentConfig.specialOpenDates = [];
+      if (!currentConfig.specialOpenDates.includes(val)) {
+        currentConfig.specialOpenDates.push(val);
+        // 如果原本在休假名單中，自動移除
+        currentConfig.closedDates = (currentConfig.closedDates || []).filter(item => item !== val);
+        renderClosedDateTags();
+        renderSpecialOpenTags();
+      }
+      input.value = "";
+    }
+
+    function removeSpecialOpenDate(dateStr) {
+      currentConfig.specialOpenDates = currentConfig.specialOpenDates.filter(d => d !== dateStr);
+      renderSpecialOpenTags();
+    }
+
+    // 儲存設定
+    function saveAdminSettings() {
+      const days = parseInt(document.getElementById("cfgPreorderDays").value, 10);
+      currentConfig.preorderDays = isNaN(days) || days < 0 ? 0 : days;
+      currentConfig.after18Plus1 = document.getElementById("cfgAfter18Plus1").checked;
+      currentConfig.blockMonday = document.getElementById("cfgBlockMonday").checked;
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(currentConfig));
+      initFlatpickr();
+      closeAdminConfigModal();
+      alert("✅ 預訂日期設定已成功更新並生效！");
+    }
+
+    // 恢復預設
+    function resetToDefaultSettings() {
+      if (confirm("確定要恢復原廠預設的日期設定嗎？")) {
+        currentConfig = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+        localStorage.removeItem(STORAGE_KEY);
+        openAdminConfigModal();
+        initFlatpickr();
+        alert("已恢復預設設定！");
+      }
+    }
+
+    // ================= 表單原有功能與邏輯 =================
     const standardFlavors = [
       "A 原味戚風＋藍莓果醬&藍莓＋豆乳奶凍＋原味奶油",
       "B 可可戚風＋當季水果＋Oreo巧克力脆＋Oreo鹹奶油",
@@ -180,42 +538,33 @@
       "4. 焙茶戚風＋當季水果＋原味奶油"
     ];
 
-    const form = document.getElementById("cakeOrderForm");
-    const submitBtn = document.getElementById("submitBtn");
-    const submitBtnText = document.getElementById("submitBtnText");
     const sizeSelect = document.getElementById("size");
     const flavorSelect = document.getElementById("flavor");
     const flavorHint = document.getElementById("flavorHint");
     const candleCheckbox = document.getElementById("candleCheckbox");
     const candleField = document.getElementById("candleField");
     const candleDetail = document.getElementById("candleDetail");
-    const noAddonCheckbox = document.getElementById("noAddonCheckbox");
-    const otherAddonCheckboxes = document.querySelectorAll('input[name="addons"]:not([value="無"])');
+    const noAddonsCheckbox = document.getElementById("noAddonsCheckbox");
+    const otherAddons = document.querySelectorAll('input[name="addons"]:not(#noAddonsCheckbox)');
 
-    // ===== LIFF 初始化 =====
-    let liffReady = false;
-    const liffInitPromise = (typeof liff !== "undefined")
-      ? liff.init({ liffId: LIFF_ID }).then(async () => {
-          liffReady = true;
-          // 在 LINE 內開啟時，自動帶入 LINE 暱稱
-          if (liff.isInClient()) {
-            try {
-              const profile = await liff.getProfile();
-              const lineNameInput = document.getElementById("lineName");
-              if (!lineNameInput.value) lineNameInput.value = profile.displayName;
-            } catch (e) {}
-          }
-        }).catch(() => { liffReady = false; })
-      : Promise.resolve();
+    // 加購互斥防呆
+    noAddonsCheckbox.addEventListener("change", function() {
+      if (this.checked) {
+        otherAddons.forEach(cb => { cb.checked = false; });
+        candleField.classList.add("hidden");
+        candleDetail.value = "";
+      }
+    });
 
-    // 從 LINE 返回表單時，還原送出按鈕
-    function resetSubmitBtn() {
-      submitBtn.disabled = false;
-      submitBtnText.textContent = SUBMIT_TEXT;
-    }
-    window.addEventListener("pageshow", resetSubmitBtn);
+    otherAddons.forEach(cb => {
+      cb.addEventListener("change", function() {
+        if (this.checked && noAddonsCheckbox.checked) {
+          noAddonsCheckbox.checked = false;
+        }
+      });
+    });
 
-    // 數字蠟燭展開/收合
+    // 數字蠟燭展開
     candleCheckbox.addEventListener("change", function() {
       if (this.checked) {
         candleField.classList.remove("hidden");
@@ -226,60 +575,14 @@
       }
     });
 
-    // 加購互斥邏輯
-    noAddonCheckbox.addEventListener("change", function() {
-      if (this.checked) {
-        otherAddonCheckboxes.forEach(cb => cb.checked = false);
-        candleField.classList.add("hidden");
-        candleDetail.value = "";
-      }
-    });
-
-    otherAddonCheckboxes.forEach(cb => {
-      cb.addEventListener("change", function() {
-        if (this.checked) noAddonCheckbox.checked = false;
-      });
-    });
-
-    const now = new Date();
-    const minBookingDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + PREORDER_DAYS);
-    const lastDayOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
-
-    const formatYMD = (d) => {
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${y}-${m}-${day}`;
-    };
-
-    flatpickr("#date", {
-      locale: {
-        firstDayOfWeek: 0,
-        weekdays: { shorthand: ["日", "一", "二", "三", "四", "五", "六"], longhand: ["週日", "週一", "週二", "週三", "週四", "週五", "週六"] },
-        months: { shorthand: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"], longhand: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"] }
-      },
-      minDate: formatYMD(minBookingDate),
-      maxDate: formatYMD(lastDayOfNextMonth),
-      dateFormat: "Y-m-d",
-      disableMobile: true,
-      disable: [
-        function(date) {
-          if (date.getDay() === 1) return true; // 每週一公休
-          const dateStr = formatYMD(date);
-          const mdStr = dateStr.slice(5);
-          if (CLOSED_DATES.includes(dateStr) || CLOSED_DATES.includes(mdStr)) return true;
-          return false;
-        }
-      ]
-    });
-
+    // 尺寸與口味聯動
     sizeSelect.addEventListener("change", function() {
       const val = this.value;
-      flavorSelect.innerHTML = '<option value="">選擇口味</option>';
+      flavorSelect.innerHTML = '<option value="">請選擇口味</option>';
 
       if (val.includes("整模")) {
         flavorHint.classList.remove("hidden");
-        flavorHint.innerText = "✨口味固定喔，目前當季水果為藍莓或綠葡萄";
+        flavorHint.innerText = "✨ 口味固定，當季水果為藍莓或綠葡萄";
         standardFlavors.forEach(item => {
           const opt = document.createElement("option");
           opt.value = item;
@@ -287,7 +590,8 @@
           flavorSelect.appendChild(opt);
         });
       } else if (val.includes("漢堡盒")) {
-        flavorHint.classList.add("hidden");
+        flavorHint.classList.remove("hidden");
+        flavorHint.innerText = "✨ 口味固定，當季水果為藍莓或綠葡萄";
         burgerFlavors.forEach(item => {
           const opt = document.createElement("option");
           opt.value = item;
@@ -296,40 +600,67 @@
         });
       } else {
         flavorHint.classList.add("hidden");
-        flavorSelect.innerHTML = '<option value="">請先選尺寸</option>';
+        flavorSelect.innerHTML = '<option value="">先選尺寸</option>';
       }
     });
 
-    form.addEventListener("submit", async function(e) {
+    // 表單送出前「全面嚴格驗證」
+    document.getElementById("cakeOrderForm").addEventListener("submit", function(e) {
       e.preventDefault();
 
-      if (!this.checkValidity()) {
-        this.reportValidity();
+      // 1. 蠟燭必填歲數驗證
+      if (candleCheckbox.checked && candleDetail.value.trim() === "") {
+        alert("⚠️ 您有加購數字蠟燭，請填寫需要的歲數（或問號）喔！若不需要請取消勾選蠟燭。");
+        candleDetail.focus();
         return;
       }
 
+      // 2. 手機號碼格式驗證（必須為 09 開頭共 10 碼）
+      const phoneInput = document.getElementById("phone");
+      const cleanPhone = phoneInput.value.replace(/[-\s]/g, "");
+      const phoneRegex = /^09\d{8}$/;
+      if (!phoneRegex.test(cleanPhone)) {
+        alert("⚠️ 請填寫正確的手機號碼（共 10 碼，例如：0912345678）！");
+        phoneInput.focus();
+        return;
+      }
+
+      // 3. 英文題字中文字檢查防呆
+      const letteringInput = document.getElementById("lettering");
+      const letteringVal = letteringInput.value.trim();
+      if (/[\u4e00-\u9fa5]/.test(letteringVal)) {
+        alert("⚠️ 提醒您：題字目前僅提供英文（最多2-3個字，如 HBD），暫無提供中文題字喔！請修改後再送出。");
+        letteringInput.focus();
+        return;
+      }
+
+      // 處理加購項目
       let selectedAddons = Array.from(document.querySelectorAll('input[name="addons"]:checked')).map(el => el.value);
       if (candleCheckbox.checked && candleDetail.value.trim() !== "") {
         selectedAddons = selectedAddons.map(item => item.includes("數字蠟燭") ? `數字蠟燭 $30/支 (${candleDetail.value.trim()})` : item);
       }
       const addonsText = selectedAddons.length > 0 ? selectedAddons.join("、") : "無";
 
+      const cakeColor = document.getElementById("cakeColor").value.trim() || "無 / LINE討論";
+      const lettering = letteringVal || "無";
+      const customNote = document.getElementById("customNote").value.trim() || "無";
+
       const orderData = {
-        cakeColor: document.getElementById("cakeColor").value.trim() || "無 / LINE討論",
-        lettering: document.getElementById("lettering").value.trim() || "無",
-        customNote: document.getElementById("customNote").value.trim() || "無",
-        size: sizeSelect.value,
-        flavor: flavorSelect.value,
+        cakeColor: cakeColor,
+        lettering: lettering,
+        customNote: customNote,
+        size: document.getElementById("size").value,
+        flavor: document.getElementById("flavor").value,
         addons: addonsText,
         date: document.getElementById("date").value,
         time: document.getElementById("time").value,
         location: "台南市中西區友愛街93號",
         lineName: document.getElementById("lineName").value.trim(),
         name: document.getElementById("name").value.trim(),
-        phone: document.getElementById("phone").value.trim()
+        phone: cleanPhone
       };
 
-      const orderMessage = 
+      const message = 
 `🎂【蛋糕訂購資訊】
 
 蛋糕體顏色：${orderData.cakeColor}
@@ -351,26 +682,28 @@
 
 📸 圖片提醒：已確認送出後傳送參考圖片報價`;
 
-      submitBtn.disabled = true;
-      submitBtnText.textContent = "送出中...";
+      const encodedId = encodeURIComponent(LINE_OA_ID);
+      const encodedMsg = encodeURIComponent(message);
+      const lineUrl = `https://line.me/R/oaMessage/${encodedId}/?${encodedMsg}`;
 
-      await liffInitPromise;
+      // 顯示覆蓋畫面並提醒按發送
+      document.getElementById("cakeOrderForm").classList.add("hidden");
+      const overlay = document.getElementById("successOverlay");
+      overlay.classList.remove("hidden");
+      document.getElementById("lineManualBtn").href = lineUrl;
 
-      // 🚀 方案一：在 LINE 內開啟 → 直接以客人身分傳給官方 LINE，傳完關閉視窗
-      if (liffReady && liff.isInClient()) {
-        try {
-          await liff.sendMessages([{ type: "text", text: orderMessage }]);
-          liff.closeWindow();
-          return;
-        } catch (err) {
-          // 傳送失敗則走備援
-        }
-      }
-
-      // 🔁 方案二（備援）：開啟官方 LINE 並預填訂單，客人按傳送即可
-      const lineUrl = `https://line.me/R/oaMessage/${LINE_OA_ID}/?${encodeURIComponent(orderMessage)}`;
-      window.location.href = lineUrl;
+      // 跳轉 LINE
+      const jumpLink = document.createElement("a");
+      jumpLink.href = lineUrl;
+      jumpLink.target = "_blank";
+      jumpLink.rel = "noopener noreferrer";
+      document.body.appendChild(jumpLink);
+      jumpLink.click();
+      jumpLink.remove();
     });
+
+    // 啟動日期初始化
+    initFlatpickr();
   </script>
 </body>
 </html>
