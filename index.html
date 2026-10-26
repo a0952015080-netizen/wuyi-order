@@ -25,7 +25,7 @@
     <!-- 表頭標題（蛋糕圖案可點擊觸發管理員設定） -->
     <div class="text-center mb-3">
       <h1 class="text-lg font-bold text-stone-800 flex items-center justify-center gap-1.5 select-none">
-        <span id="adminCakeBtn" class="cursor-pointer hover:scale-125 active:scale-95 transition-transform duration-150 inline-block" title="店長管理模式（點擊輸入密碼）">🎂</span>
+        <span id="adminCakeBtn" class="cursor-pointer active:scale-90 transition-transform duration-150 inline-block select-none">🎂</span>
         <span>WUYI 蛋糕訂購預訂單</span>
       </h1>
       <p class="text-[11px] text-stone-500">填妥後將自動前往 LINE 官方私訊，由客服為您報價確認</p>
@@ -123,8 +123,8 @@
 
       <!-- 提前預訂防呆與地點 -->
       <div class="p-2 bg-amber-50 rounded-lg border border-amber-200 text-[11px] text-amber-800 space-y-0.5">
-        <div>⏳ <strong>預訂須知：</strong>手作新鮮蛋糕<strong id="preorderDaysNotice">需提前 3 天預約</strong></div>
-        <div class="pl-4 text-[10px] text-amber-700">（每日 18:00 截單；週一固定公休）</div>
+        <div>⏳ <strong>預訂須知：</strong>手作新鮮蛋糕<strong id="preorderDaysNotice">最晚前一週討論</strong></div>
+        <div class="pl-4 text-[10px] text-amber-700">（週一固定休息，週二不定期休息）</div>
         <div>📍 <strong>自取地點：</strong>台南市中西區友愛街93號</div>
       </div>
 
@@ -158,7 +158,7 @@
       <div class="space-y-2 p-2.5 bg-stone-50 rounded-xl border border-stone-200">
         <div>
           <label class="block text-[11px] font-semibold text-stone-700 mb-0.5">想要的蛋糕體顏色（選填）</label>
-          <input type="text" id="cakeColor" maxlength="30" placeholder="例如：藍 粉 黃 紫 灰(或Line討論)" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs bg-white" />
+          <input type="text" id="cakeColor" maxlength="30" placeholder="例如：如圖款或藍,粉,黃,紫,灰,Line討論" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs bg-white" />
         </div>
 
         <div>
@@ -285,10 +285,10 @@
     const LINE_OA_ID = "@230fpemy";
     
     // ================= 日期管理系統預設值與本地儲存 =================
-    const STORAGE_KEY = "wuyi_order_date_config_v1";
+    const STORAGE_KEY = "wuyi_order_date_config_v2";
 
     const DEFAULT_CONFIG = {
-      preorderDays: 3,
+      preorderDays: 7,
       after18Plus1: true,
       blockMonday: true,
       closedDates: ["2026-10-27", "2026-11-24", "2026-12-01"],
@@ -334,7 +334,11 @@
       // 更新頁面上的預訂須知文字
       const noticeEl = document.getElementById("preorderDaysNotice");
       if (noticeEl) {
-        noticeEl.innerText = `需提前 ${currentConfig.preorderDays} 天預約`;
+        if (Number(currentConfig.preorderDays) === 7) {
+          noticeEl.innerText = "最晚前一週討論";
+        } else {
+          noticeEl.innerText = `需提前 ${currentConfig.preorderDays} 天預約`;
+        }
       }
 
       flatpickrInstance = flatpickr("#date", {
@@ -378,12 +382,26 @@
     const passwordError = document.getElementById("passwordError");
     const adminConfigModal = document.getElementById("adminConfigModal");
 
-    // 點擊蛋糕圖案
+    // 點擊蛋糕圖案 3 次觸發管理員模式（防客人誤觸）
+    let cakeClickCount = 0;
+    let cakeClickTimer = null;
+
     adminCakeBtn.addEventListener("click", () => {
-      adminPasswordModal.classList.remove("hidden");
-      adminPasswordInput.value = "";
-      passwordError.classList.add("hidden");
-      setTimeout(() => adminPasswordInput.focus(), 100);
+      cakeClickCount++;
+      clearTimeout(cakeClickTimer);
+
+      if (cakeClickCount >= 3) {
+        cakeClickCount = 0;
+        adminPasswordModal.classList.remove("hidden");
+        adminPasswordInput.value = "";
+        passwordError.classList.add("hidden");
+        setTimeout(() => adminPasswordInput.focus(), 100);
+      } else {
+        // 1.5 秒內若未連續點擊滿 3 次則歸零
+        cakeClickTimer = setTimeout(() => {
+          cakeClickCount = 0;
+        }, 1500);
+      }
     });
 
     function closeAdminPasswordModal() {
