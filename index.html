@@ -291,7 +291,7 @@ input, select, textarea {
   </div>
 </div>
 
-<!-- ================= 店長可訂購日期修改管理 Modal ================= -->
+<!-- ================= 店長可訂購日期修改管理 Modal (支援 GitHub API 自動同步) ================= -->
 <div id="adminDateModal" class="fixed inset-0 bg-black/75 z-50 hidden flex items-center justify-center p-3 overflow-y-auto">
   <div class="bg-white max-w-md w-full rounded-2xl shadow-2xl p-4 sm:p-5 border border-stone-300 space-y-4 my-auto max-h-[92vh] flex flex-col">
     
@@ -300,9 +300,9 @@ input, select, textarea {
       <div>
         <h3 class="text-sm sm:text-base font-bold text-stone-800 flex items-center gap-1.5">
           <span>📅</span>
-          <span>店長日期管理（隨時開關免貼代碼）</span>
+          <span>店長日期管理（點擊即開關，同網址同步）</span>
         </h3>
-        <p class="text-[11px] text-stone-500 mt-0.5">點擊每一天即可單獨切換「開放」或「關閉」</p>
+        <p class="text-[11px] text-stone-500 mt-0.5">點擊每一天切換「開放/關閉」，一鍵自動同步至 GitHub</p>
       </div>
       <button type="button" onclick="closeAdminDateModal()" class="text-stone-400 hover:text-stone-700 text-xl font-bold p-1">✕</button>
     </div>
@@ -355,40 +355,83 @@ input, select, textarea {
         </div>
 
         <!-- 日期列表容器 -->
-        <div id="dayListContainer" class="space-y-1.5 max-h-56 overflow-y-auto p-1 bg-stone-50 rounded-xl border border-stone-200">
+        <div id="dayListContainer" class="space-y-1.5 max-h-52 overflow-y-auto p-1 bg-stone-50 rounded-xl border border-stone-200">
           <!-- 由 JS 動態生成日期按鈕 -->
         </div>
       </div>
 
-      <!-- 跨裝置同步／免進 GITHUB 說明 -->
-      <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900 space-y-1.5">
-        <div class="font-bold">✨ 如何讓客人看到最新開關日期？（免進 GitHub 貼代碼）</div>
-        <p class="text-[10px] leading-relaxed text-amber-800">
-          修改後請按下方<strong>「儲存於此裝置」</strong>。若要讓官方 LINE 客人或 IG 粉絲直接套用最新日期，只需點擊<strong>「複製最新預訂連結」</strong>貼在 LINE 圖文選單或發給客人，客人開啟即是最新開放日期！
-        </p>
+      <!-- GitHub API 自動同步設定區塊（折疊面板，店長只需填一次 Token） -->
+      <div class="p-3 bg-stone-100 rounded-xl border border-stone-300 space-y-2">
+        <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleGithubSettings()">
+          <div class="flex items-center gap-1.5 font-bold text-stone-800">
+            <span>⚙️</span>
+            <span>GitHub 自動同步設定</span>
+            <span id="ghTokenStatusBadge" class="text-[10px] px-1.5 py-0.2 rounded bg-amber-200 text-amber-800 font-normal">未設定 Token</span>
+          </div>
+          <span id="ghToggleArrow" class="text-stone-500 text-xs">▼ 展開</span>
+        </div>
+
+        <div id="ghSettingsPanel" class="hidden space-y-2 pt-2 border-t border-stone-200 text-stone-600">
+          <div>
+            <label class="block text-[11px] font-semibold text-stone-700 mb-0.5">GitHub 個人存取權杖 (Personal Access Token)：</label>
+            <input type="password" id="ghTokenInput" placeholder="請貼上 ghp_ 開頭的權杖 Token" class="w-full border border-stone-300 rounded-lg p-2 bg-white text-xs font-mono outline-none focus:border-[#62502D]" />
+            <div class="flex justify-between items-center mt-1 text-[10px]">
+              <span class="text-stone-500">🔒 Token 僅存在您本人的手機瀏覽器，絕不外流</span>
+              <button type="button" onclick="toggleTokenHelp()" class="text-[#62502D] font-bold underline">❓ 1分鐘如何取得 Token？</button>
+            </div>
+          </div>
+
+          <!-- Token 教學折疊 -->
+          <div id="tokenHelpBox" class="hidden p-2.5 bg-amber-50 rounded-lg border border-amber-200 text-[10px] text-amber-900 space-y-1 leading-relaxed">
+            <div class="font-bold">📖 取得 Token 步驟（只需一次）：</div>
+            <div>1. 電腦或手機登入 GitHub，點右上角頭像 ➔ 點「<strong>Settings</strong>」。</div>
+            <div>2. 頁面左側滑到最下方 ➔ 點「<strong>Developer settings</strong>」。</div>
+            <div>3. 點「<strong>Personal access tokens</strong>」➔ 點「<strong>Tokens (classic)</strong>」➔「<strong>Generate new token (classic)</strong>」。</div>
+            <div>4. Note 填寫 <code>wuyi-cake</code>，Expiration 選 <code>No expiration</code>（無期限），勾選第一項 <code>repo</code>（完整儲存庫寫入權限）。</div>
+            <div>5. 滑到最底按綠色「Generate token」，將產生的 <code>ghp_...</code> 複製貼在上方輸入框即可！</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <div>
+              <label class="block text-[10px] text-stone-500 mb-0.5">儲存庫 Repo：</label>
+              <input type="text" id="ghRepoInput" value="a0952015080-netizen/wuyi-order" class="w-full border border-stone-300 rounded p-1 bg-white text-[11px] font-mono" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-stone-500 mb-0.5">分支 Branch：</label>
+              <input type="text" id="ghBranchInput" value="main" class="w-full border border-stone-300 rounded p-1 bg-white text-[11px] font-mono" />
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
 
     <!-- 底部功能按鈕區 -->
     <div class="pt-2 border-t border-stone-200 space-y-2 shrink-0">
+      <!-- 方案三核心按鈕：一鍵自動同步至 GitHub -->
+      <button type="button" id="btnSyncGithub" onclick="syncScheduleToGithub()" class="w-full bg-[#24292F] hover:bg-black text-white font-bold py-3 rounded-xl shadow flex items-center justify-center gap-2 text-xs transition duration-200">
+        <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        <span>儲存並自動推送到 GitHub（同網址生效）</span>
+      </button>
+
       <div class="grid grid-cols-2 gap-2">
-        <button type="button" onclick="saveAdminConfig()" class="bg-[#62502D] hover:bg-[#4e3f22] text-white font-bold py-2.5 rounded-xl shadow text-xs">
-          💾 儲存並套用修改
+        <button type="button" onclick="saveAdminConfigLocalOnly()" class="bg-stone-200 hover:bg-stone-300 text-stone-700 font-semibold py-2 rounded-xl text-xs">
+          僅儲存於此手機
         </button>
-        <button type="button" onclick="copyShareableLink()" class="bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-2.5 rounded-xl shadow text-xs">
-          🔗 複製最新預訂連結
+        <button type="button" onclick="copyShareableLink()" class="bg-[#06C755] hover:bg-[#05b34c] text-white font-semibold py-2 rounded-xl shadow text-xs">
+          備用：複製帶參數連結
         </button>
       </div>
-      <div class="flex justify-between items-center text-[10px] text-stone-500 pt-0.5">
-        <button type="button" onclick="copyConfigCode()" class="underline hover:text-stone-800">
-          📋 備用：複製 config.js 代碼
-        </button>
-        <button type="button" onclick="closeAdminDateModal()" class="text-stone-400 hover:text-stone-600 underline">
+
+      <div class="flex justify-between items-center text-[10px] text-stone-400 pt-0.5">
+        <span>網址永遠維持：<code class="text-stone-600">.../wuyi-order/</code></span>
+        <button type="button" onclick="closeAdminDateModal()" class="hover:text-stone-600 underline">
           關閉返回
         </button>
       </div>
-      <p id="adminSaveAlert" class="hidden text-xs text-emerald-700 bg-emerald-50 p-1.5 rounded-lg border border-emerald-200 text-center font-bold"></p>
+
+      <!-- 狀態提示框 -->
+      <div id="adminStatusAlert" class="hidden p-2 rounded-lg text-xs font-bold text-center"></div>
     </div>
 
   </div>
@@ -425,49 +468,65 @@ if (!ACTIVE_CONFIG.cakePhotos || ACTIVE_CONFIG.cakePhotos.length === 0) ACTIVE_C
 if (!ACTIVE_CONFIG.ribbonColors) ACTIVE_CONFIG.ribbonColors = DEFAULT_CONFIG.ribbonColors;
 if (!ACTIVE_CONFIG.addons) ACTIVE_CONFIG.addons = DEFAULT_CONFIG.addons;
 
-// ==================== 2. 本機與 URL 參數動態同步機制（免進 GitHub） ====================
-const STORAGE_KEY = "wuyi_cake_booking_custom_v2";
+// ==================== 2. 本機與遠端 schedule.json 同步機制（方案三核心） ====================
+const STORAGE_KEY = "wuyi_cake_booking_custom_v3";
+const GH_TOKEN_KEY = "wuyi_gh_token";
+const GH_REPO_KEY = "wuyi_gh_repo";
+const GH_BRANCH_KEY = "wuyi_gh_branch";
 
-// 取得最新自訂預約設定
-function loadBookingSettings() {
-  const defaults = {
+function getInitialBookingSettings() {
+  return {
     minDaysNotice: ACTIVE_CONFIG.booking.minDaysNotice !== undefined ? ACTIVE_CONFIG.booking.minDaysNotice : 1,
     maxDaysAhead: ACTIVE_CONFIG.booking.maxDaysAhead !== undefined ? ACTIVE_CONFIG.booking.maxDaysAhead : 7,
     weeklyClosedDay: ACTIVE_CONFIG.booking.weeklyClosedDay !== undefined ? ACTIVE_CONFIG.booking.weeklyClosedDay : 1,
     closedDates: Array.isArray(ACTIVE_CONFIG.booking.closedDates) ? [...ACTIVE_CONFIG.booking.closedDates] : [],
     specialOpenDates: []
   };
-
-  // 1. 優先從網址參數讀取（店長發給客人的連結包含 ?cfg=...）
-  const urlParams = new URLSearchParams(window.location.search);
-  const cfgParam = urlParams.get('cfg');
-  if (cfgParam) {
-    try {
-      const jsonStr = decodeURIComponent(escape(atob(cfgParam)));
-      const parsed = JSON.parse(jsonStr);
-      const merged = { ...defaults, ...parsed };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-      return merged;
-    } catch (e) {
-      console.warn("解析網址設定失敗", e);
-    }
-  }
-
-  // 2. 從本機 LocalStorage 讀取
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return { ...defaults, ...parsed };
-    }
-  } catch (e) {
-    console.warn("讀取本機設定失敗", e);
-  }
-
-  return defaults;
 }
 
-let bookingSettings = loadBookingSettings();
+let bookingSettings = getInitialBookingSettings();
+
+// 先從 LocalStorage 嘗試載入本地快取
+try {
+  const localSaved = localStorage.getItem(STORAGE_KEY);
+  if (localSaved) {
+    bookingSettings = { ...bookingSettings, ...JSON.parse(localSaved) };
+  }
+} catch (e) {
+  console.warn("讀取本地設定失敗", e);
+}
+
+// 優先：從網址參數 ?cfg= 載入（若有的話）
+const urlParams = new URLSearchParams(window.location.search);
+const cfgParam = urlParams.get('cfg');
+if (cfgParam) {
+  try {
+    const jsonStr = decodeURIComponent(escape(atob(cfgParam)));
+    const parsed = JSON.parse(jsonStr);
+    bookingSettings = { ...bookingSettings, ...parsed };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(bookingSettings));
+  } catch (e) {
+    console.warn("解析網址設定失敗", e);
+  }
+}
+
+// 【方案三關鍵】：從伺服器自動讀取 schedule.json（客人在同一連結即可載入最新開關）
+async function fetchRemoteScheduleJson() {
+  try {
+    // 加時間戳記以避開快取
+    const res = await fetch(`./schedule.json?_t=${Date.now()}`);
+    if (res.ok) {
+      const remoteData = await res.json();
+      bookingSettings = { ...bookingSettings, ...remoteData };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(bookingSettings));
+      initFlatpickrCalendar();
+      console.log("成功從 schedule.json 載入最新日期設定！");
+    }
+  } catch (err) {
+    console.warn("讀取遠端 schedule.json 失敗，維持目前設定", err);
+  }
+}
+
 let flatpickrInstance = null;
 
 const formatYMD = (d) => {
@@ -749,10 +808,9 @@ document.getElementById("copyOrderBtn").addEventListener("click", function() {
   });
 });
 
-// ==================== 純文字清洗工具（移除所有 Emoji） ====================
+// 純文字清洗工具（移除所有 Emoji）
 function cleanTextWithoutEmoji(str) {
   if (!str) return "";
-  // 移除常見 Emoji 與 Unicode 符號 (含多位元 Emoji 及結合字元)
   return str.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F018}-\u{1F270}\u{2388}-\u{23F3}\u{2B05}-\u{2B55}\u{200D}\u{FE0F}]/gu, '')
             .replace(/[🎂🔥🎉🛍️🕯️📅⚠️🔹🔺🚗✅🔍✨👉📋⬅️]/g, '')
             .trim();
@@ -827,7 +885,6 @@ document.getElementById("cakeOrderForm").addEventListener("submit", function(e) 
   const cleanLineName = cleanTextWithoutEmoji(lineNameVal);
   const cleanCustName = cleanTextWithoutEmoji(nameVal);
 
-  // 【需求重點】：發送到 LINE 官方帳號與複製出來的純文字，完全不需要 EMOJI
   const message =
 `【WUYI急單預訂詢價】
 款式（共${selectedList.length}款）：
@@ -862,7 +919,7 @@ ${selectedPhotos}
   window.location.href = lineUrl;
 });
 
-// ==================== 3. 點三下蛋糕圖片進入修改可訂購日期（核心功能） ====================
+// ==================== 3. 點三下蛋糕圖片進入修改可訂購日期 ====================
 let tripleClickCount = 0;
 let tripleClickTimer = null;
 
@@ -880,11 +937,9 @@ function handleTripleClickTrigger() {
   }
 }
 
-// 綁定頂部橫幅圖片與標題蛋糕按鈕，以及支援點擊照片進入
+// 綁定頂部橫幅圖片與標題蛋糕按鈕，以及照片點擊
 document.getElementById("headerCakeImg")?.addEventListener("click", handleTripleClickTrigger);
 document.getElementById("titleCakeBtn")?.addEventListener("click", handleTripleClickTrigger);
-
-// 任何公版照片如果點 3 下也能觸發店長管理
 document.addEventListener("click", (e) => {
   if (e.target && e.target.classList && e.target.classList.contains("cake-photo-img")) {
     handleTripleClickTrigger();
@@ -908,7 +963,6 @@ function closeAdminPasswordModal() {
 }
 
 function verifyAdminPassword() {
-  // 支援全形轉半形 ５１５１ -> 5151
   const val = adminPasswordInput.value.replace(/[\uff01-\uff5e]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xfee0)).trim();
   if (val === "5151") {
     closeAdminPasswordModal();
@@ -923,19 +977,42 @@ adminPasswordInput?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") verifyAdminPassword();
 });
 
-// ==================== 4. 店長可訂購日期修改面板（每一天皆可開關） ====================
+// ==================== 4. 店長可訂購日期修改面板（方案三：GitHub API 自動化） ====================
 const adminDateModal = document.getElementById("adminDateModal");
 const dayListContainer = document.getElementById("dayListContainer");
 const cfgMinDaysSelect = document.getElementById("cfgMinDays");
 const cfgMaxDaysSelect = document.getElementById("cfgMaxDays");
 const cfgBlockMondayCheck = document.getElementById("cfgBlockMonday");
-const adminSaveAlert = document.getElementById("adminSaveAlert");
+const adminStatusAlert = document.getElementById("adminStatusAlert");
+const btnSyncGithub = document.getElementById("btnSyncGithub");
 
-// 暫存的開關狀態
+// GitHub 設定元素
+const ghSettingsPanel = document.getElementById("ghSettingsPanel");
+const ghToggleArrow = document.getElementById("ghToggleArrow");
+const ghTokenInput = document.getElementById("ghTokenInput");
+const ghRepoInput = document.getElementById("ghRepoInput");
+const ghBranchInput = document.getElementById("ghBranchInput");
+const ghTokenStatusBadge = document.getElementById("ghTokenStatusBadge");
+const tokenHelpBox = document.getElementById("tokenHelpBox");
+
 let tempSettings = null;
 
+function toggleGithubSettings() {
+  const isHidden = ghSettingsPanel.classList.contains("hidden");
+  if (isHidden) {
+    ghSettingsPanel.classList.remove("hidden");
+    ghToggleArrow.innerText = "▲ 收合";
+  } else {
+    ghSettingsPanel.classList.add("hidden");
+    ghToggleArrow.innerText = "▼ 展開";
+  }
+}
+
+function toggleTokenHelp() {
+  tokenHelpBox.classList.toggle("hidden");
+}
+
 function openAdminDateModal() {
-  // 深拷貝當前設定至暫存
   tempSettings = JSON.parse(JSON.stringify(bookingSettings));
   if (!tempSettings.closedDates) tempSettings.closedDates = [];
   if (!tempSettings.specialOpenDates) tempSettings.specialOpenDates = [];
@@ -944,9 +1021,26 @@ function openAdminDateModal() {
   cfgMaxDaysSelect.value = String(tempSettings.maxDaysAhead);
   cfgBlockMondayCheck.checked = (tempSettings.weeklyClosedDay === 1);
 
+  // 載入已儲存的 GitHub Token
+  const savedToken = localStorage.getItem(GH_TOKEN_KEY) || "";
+  const savedRepo = localStorage.getItem(GH_REPO_KEY) || "a0952015080-netizen/wuyi-order";
+  const savedBranch = localStorage.getItem(GH_BRANCH_KEY) || "main";
+
+  ghTokenInput.value = savedToken;
+  ghRepoInput.value = savedRepo;
+  ghBranchInput.value = savedBranch;
+
+  if (savedToken) {
+    ghTokenStatusBadge.innerText = "已設定 Token ✓";
+    ghTokenStatusBadge.className = "text-[10px] px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-800 font-semibold";
+  } else {
+    ghTokenStatusBadge.innerText = "未設定 Token";
+    ghTokenStatusBadge.className = "text-[10px] px-1.5 py-0.2 rounded bg-amber-200 text-amber-800 font-normal";
+  }
+
   renderDayList();
 
-  adminSaveAlert.classList.add("hidden");
+  adminStatusAlert.classList.add("hidden");
   adminDateModal.classList.remove("hidden");
 }
 
@@ -970,7 +1064,6 @@ function renderDayList() {
     const dayOfWeek = targetDate.getDay();
     const dayName = weekdays[dayOfWeek];
 
-    // 判斷在 tempSettings 下是開啟或關閉
     let isOpen = true;
     if (tempSettings.specialOpenDates.includes(dateStr)) {
       isOpen = true;
@@ -1007,13 +1100,11 @@ function renderDayList() {
 // 單日切換開/關
 function toggleSingleDay(dateStr, makeOpen) {
   if (makeOpen) {
-    // 移出 closedDates，加入 specialOpenDates
     tempSettings.closedDates = tempSettings.closedDates.filter(d => d !== dateStr);
     if (!tempSettings.specialOpenDates.includes(dateStr)) {
       tempSettings.specialOpenDates.push(dateStr);
     }
   } else {
-    // 移出 specialOpenDates，加入 closedDates
     tempSettings.specialOpenDates = tempSettings.specialOpenDates.filter(d => d !== dateStr);
     if (!tempSettings.closedDates.includes(dateStr)) {
       tempSettings.closedDates.push(dateStr);
@@ -1022,84 +1113,176 @@ function toggleSingleDay(dateStr, makeOpen) {
   renderDayList();
 }
 
-// 全部開放
 function batchSetAllDays(makeOpen) {
   const now = new Date();
   const minDays = Number(cfgMinDaysSelect.value);
   const maxDays = Number(cfgMaxDaysSelect.value);
-
   for (let i = minDays; i <= maxDays; i++) {
     const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
     toggleSingleDay(formatYMD(d), makeOpen);
   }
 }
 
-// 依常規通則重設（清空特例）
 function resetToDefaultRules() {
   tempSettings.closedDates = [];
   tempSettings.specialOpenDates = [];
   renderDayList();
 }
 
-// 當修改下拉選單時，動態更新每日預覽
 cfgMinDaysSelect.addEventListener("change", renderDayList);
 cfgMaxDaysSelect.addEventListener("change", renderDayList);
 cfgBlockMondayCheck.addEventListener("change", renderDayList);
 
-// 儲存設定（立即生效並保存在瀏覽器）
-function saveAdminConfig() {
+// 套用設定到本地變數
+function applyTempSettingsToActive() {
   tempSettings.minDaysNotice = Number(cfgMinDaysSelect.value);
   tempSettings.maxDaysAhead = Number(cfgMaxDaysSelect.value);
   tempSettings.weeklyClosedDay = cfgBlockMondayCheck.checked ? 1 : null;
+  tempSettings.updatedAt = new Date().toISOString();
 
-  // 更新全域設定
   bookingSettings = JSON.parse(JSON.stringify(tempSettings));
   localStorage.setItem(STORAGE_KEY, JSON.stringify(bookingSettings));
-
-  // 重新初始化日曆
   initFlatpickrCalendar();
-
-  adminSaveAlert.innerText = "已成功儲存於此裝置！日曆已即時更新。";
-  adminSaveAlert.classList.remove("hidden");
-  setTimeout(() => {
-    adminSaveAlert.classList.add("hidden");
-    closeAdminDateModal();
-  }, 1000);
 }
 
-// 產生並複製專屬分享連結（客人開啟即自動載入最新日期，免貼 GitHub）
+// 僅儲存於此手機（本地）
+function saveAdminConfigLocalOnly() {
+  applyTempSettingsToActive();
+  showAdminAlert("已儲存於本機！日曆已即時更新。", "success");
+  setTimeout(closeAdminDateModal, 1200);
+}
+
+// ==================== 5. 方案三核心：透過 GitHub API 自動更新 schedule.json ====================
+async function syncScheduleToGithub() {
+  const token = ghTokenInput.value.trim();
+  const repo = ghRepoInput.value.trim();
+  const branch = ghBranchInput.value.trim() || "main";
+
+  if (!token) {
+    showAdminAlert("請先在下方「GitHub 自動同步設定」貼上您的 GitHub Token 才能自動推送喔！", "error");
+    ghSettingsPanel.classList.remove("hidden");
+    ghToggleArrow.innerText = "▲ 收合";
+    ghTokenInput.focus();
+    return;
+  }
+
+  // 儲存 Token 到本地以便下次免再輸入
+  localStorage.setItem(GH_TOKEN_KEY, token);
+  localStorage.setItem(GH_REPO_KEY, repo);
+  localStorage.setItem(GH_BRANCH_KEY, branch);
+
+  applyTempSettingsToActive();
+
+  btnSyncGithub.disabled = true;
+  btnSyncGithub.innerHTML = `<span>⏳ 正在連線 GitHub API 更新中...</span>`;
+  showAdminAlert("連線 GitHub API 檢查檔案中...", "info");
+
+  try {
+    const filePath = "schedule.json";
+    const getUrl = `https://api.github.com/repos/${repo}/contents/${filePath}?ref=${branch}`;
+
+    // 1. 取得檔案當前 SHA（若已存在）
+    let currentSha = null;
+    const getRes = await fetch(getUrl, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/vnd.github.v3+json"
+      }
+    });
+
+    if (getRes.ok) {
+      const fileData = await getRes.json();
+      currentSha = fileData.sha;
+    } else if (getRes.status === 401) {
+      throw new Error("GitHub Token 無效或已過期，請確認是否複製正確！");
+    } else if (getRes.status === 404) {
+      // 檔案尚未存在，無 sha 即可直接新增
+      currentSha = null;
+    } else if (getRes.status === 403) {
+      throw new Error("權限不足！請確認您的 Token 有勾選 repo 寫入權限。");
+    }
+
+    // 2. 送出 PUT 請求更新 schedule.json
+    showAdminAlert("正在將最新日期推送到 GitHub...", "info");
+    const jsonContent = JSON.stringify(bookingSettings, null, 2);
+    // Base64 編碼支援中文與 Unicode
+    const base64Content = btoa(unescape(encodeURIComponent(jsonContent)));
+
+    const putUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
+    const putBody = {
+      message: `update: 店長更新公版訂購日期 (${new Date().toLocaleDateString('zh-TW')} ${new Date().toLocaleTimeString('zh-TW')})`,
+      content: base64Content,
+      branch: branch
+    };
+    if (currentSha) {
+      putBody.sha = currentSha;
+    }
+
+    const putRes = await fetch(putUrl, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(putBody)
+    });
+
+    if (!putRes.ok) {
+      const errData = await putRes.json().catch(() => ({}));
+      throw new Error(errData.message || `GitHub API 回傳錯誤碼: ${putRes.status}`);
+    }
+
+    // 成功！
+    showAdminAlert("🎉 成功！已自動推送到 GitHub！客人開啟同一連結即會載入最新日期！", "success");
+    ghTokenStatusBadge.innerText = "已設定 Token ✓";
+    ghTokenStatusBadge.className = "text-[10px] px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-800 font-semibold";
+
+    setTimeout(() => {
+      closeAdminDateModal();
+    }, 2000);
+
+  } catch (err) {
+    console.error("同步至 GitHub 失敗", err);
+    showAdminAlert(`⚠️ 同步失敗：${err.message}`, "error");
+  } finally {
+    btnSyncGithub.disabled = false;
+    btnSyncGithub.innerHTML = `
+      <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+      <span>儲存並自動推送到 GitHub（同網址生效）</span>
+    `;
+  }
+}
+
+// 狀態提示框渲染
+function showAdminAlert(msg, type) {
+  adminStatusAlert.innerText = msg;
+  adminStatusAlert.classList.remove("hidden", "bg-emerald-50", "text-emerald-800", "border-emerald-300", "bg-rose-50", "text-rose-800", "border-rose-300", "bg-blue-50", "text-blue-800", "border-blue-300");
+  
+  if (type === "success") {
+    adminStatusAlert.classList.add("bg-emerald-50", "text-emerald-800", "border", "border-emerald-300");
+  } else if (type === "error") {
+    adminStatusAlert.classList.add("bg-rose-50", "text-rose-800", "border", "border-rose-300");
+  } else {
+    adminStatusAlert.classList.add("bg-blue-50", "text-blue-800", "border", "border-blue-300");
+  }
+}
+
+// 備用：複製帶參數連結
 function copyShareableLink() {
-  tempSettings.minDaysNotice = Number(cfgMinDaysSelect.value);
-  tempSettings.maxDaysAhead = Number(cfgMaxDaysSelect.value);
-  tempSettings.weeklyClosedDay = cfgBlockMondayCheck.checked ? 1 : null;
-
-  bookingSettings = JSON.parse(JSON.stringify(tempSettings));
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(bookingSettings));
-  initFlatpickrCalendar();
-
+  applyTempSettingsToActive();
   const jsonStr = JSON.stringify(bookingSettings);
   const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
   const shareUrl = `${window.location.origin}${window.location.pathname}?cfg=${encoded}`;
-
   navigator.clipboard.writeText(shareUrl).then(() => {
-    adminSaveAlert.innerText = "已複製最新預訂連結！可直接發給客人或設於 LINE 圖文選單";
-    adminSaveAlert.classList.remove("hidden");
-    setTimeout(() => { adminSaveAlert.classList.add("hidden"); }, 3500);
-  }).catch(() => {
-    prompt("請手動複製以下最新預訂連結：", shareUrl);
+    showAdminAlert("已複製最新預訂連結！", "success");
+    setTimeout(() => adminStatusAlert.classList.add("hidden"), 3000);
   });
 }
 
-// 複製 config.js 代碼（備用）
-function copyConfigCode() {
-  const code = `// 可直接複製覆蓋 config.js 中的 booking 設定：\nbooking: ${JSON.stringify(bookingSettings, null, 2)}`;
-  navigator.clipboard.writeText(code).then(() => {
-    alert("已複製設定代碼至剪貼簿！");
-  });
-}
-
-// 啟動日曆
+// 啟動日曆與遠端 schedule.json 自動讀取
 initFlatpickrCalendar();
+fetchRemoteScheduleJson();
 </script>
 </body>
 </html>
