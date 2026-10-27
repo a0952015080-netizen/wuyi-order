@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <base target="_blank">
-<title>🎂 WUYI 蛋糕訂購預訂單1</title>
+<title>🎂 WUYI 蛋糕訂購預訂單</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- Flatpickr 日曆 -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -191,7 +191,7 @@ font-size: 16px !important;
 <h3 class="text-sm font-bold text-stone-800 flex items-center gap-1">
 <span>👑</span> 店長模式：日期開放管理
 </h3>
-<p class="text-[11px] text-stone-500">設定儲存後自動同步至 GitHub，所有客人立即生效</p>
+<p class="text-[11px] text-stone-500">設定儲存後自動同步至雲端試算表，所有客人立即生效</p>
 </div>
 <button type="button" id="adminClosePanelBtn" class="text-stone-400 hover:text-stone-600 text-lg leading-none">&times;</button>
 </div>
@@ -267,10 +267,11 @@ font-size: 16px !important;
 </div>
 <p id="adminSyncStatus" class="text-[10px] text-center text-stone-500 hidden"></p>
 <details class="text-[11px] text-stone-500 pt-1">
-<summary class="cursor-pointer text-stone-400 hover:text-stone-600 select-none">🔑 設定 / 更換 GitHub Token</summary>
-<div class="mt-1 space-y-1 bg-stone-50 p-2 rounded-lg border border-stone-200">
-<input type="text" id="adminTokenInput" placeholder="ghp_..." class="w-full border border-stone-300 rounded p-1.5 text-xs font-mono bg-white outline-none" />
-<p class="text-[10px] text-amber-700">⚠️ Token 必須勾選 <strong>repo</strong> 權限才能成功上傳至 GitHub。</p>
+<summary class="cursor-pointer text-stone-400 hover:text-stone-600 select-none">🔗 設定 Google 試算表同步網址</summary>
+<div class="mt-1 space-y-1 bg-stone-50 p-2.5 rounded-lg border border-stone-200">
+<label class="block text-[11px] font-semibold text-stone-700">Google Apps Script 網頁應用程式網址：</label>
+<input type="text" id="adminGasUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full border border-stone-300 rounded p-1.5 text-xs font-mono bg-white outline-none" />
+<p class="text-[10px] text-stone-500">貼上 Google 試算表部署網址後，所有客人手機將自動由 Google 試算表即時同步！</p>
 </div>
 </details>
 </div>
@@ -281,11 +282,13 @@ font-size: 16px !important;
 const LINE_OA_ID = "@230fpemy";
 
 // ============================================
-// ☁️ GitHub 雲端同步設定（店長儲存自動同步，客人打開即時更新）
+// ☁️ Google 試算表雲端同步設定（店長儲存自動同步，客人打開即時更新）
 // ============================================
-const GITHUB_REPO = "a0952015080-netizen/wuyi-order";
-const GITHUB_TOKEN = "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";
-const SETTINGS_FILE = "calendar_settings.json";
+const DEFAULT_GAS_URL = ""; // 可由店長在面板直接貼上，自動記在瀏覽器
+let currentGasUrl = "";
+try {
+currentGasUrl = localStorage.getItem("wuyi_gas_url") || DEFAULT_GAS_URL;
+} catch(e) {}
 
 // 預設公休與預約規則（預設開放一個月、提前一週預約、週一固定公休）
 const DEFAULT_CLOSED_DATES = ["2026-10-27", "2026-11-24", "2026-12-01"];
@@ -301,11 +304,6 @@ try {
 const savedMon = localStorage.getItem("wuyi_cake_disable_monday_v1");
 if (savedMon !== null) {
 disableMondaySetting = JSON.parse(savedMon);
-}
-// 清除舊無效 token 快取
-const oldTok = localStorage.getItem("wuyi_github_token");
-if (oldTok && oldTok.startsWith("ghp_Luc7")) {
-localStorage.removeItem("wuyi_github_token");
 }
 } catch(e) {}
 
@@ -428,33 +426,41 @@ return status !== 'open';
 // 初次啟動日曆
 initCalendar();
 
-// ☁️ 客人進站時：從 GitHub 自動加載店長的最新雲端設定
+// ☁️ 客人進站時：從 Google 試算表 (GAS) 或本地加載店長最新雲端日曆
 async function fetchCloudCalendarSettings() {
+if (currentGasUrl) {
 try {
-const cloudUrls = [
-`./${SETTINGS_FILE}?_t=${Date.now()}`,
-`https://raw.githubusercontent.com/${GITHUB_REPO}/main/${SETTINGS_FILE}?_t=${Date.now()}`
-];
-for (const url of cloudUrls) {
-try {
-const res = await fetch(url, { cache: "no-store" });
+const res = await fetch(currentGasUrl + (currentGasUrl.includes("?") ? "&" : "?") + "_t=" + Date.now(), { method: "GET" });
 if (res.ok) {
-const data = await res.json();
-if (data && data.calendarDateStatus) {
-calendarDateStatus = data.calendarDateStatus;
-if (data.disableMonday !== undefined) {
-disableMondaySetting = data.disableMonday;
-}
+const json = await res.json();
+const data = json.data || json;
+if (data && (data.calendarDateStatus || data.disableMonday !== undefined)) {
+if (data.calendarDateStatus) calendarDateStatus = data.calendarDateStatus;
+if (data.disableMonday !== undefined) disableMondaySetting = data.disableMonday;
 try {
 localStorage.setItem("wuyi_cake_date_status_v1", JSON.stringify(calendarDateStatus));
 localStorage.setItem("wuyi_cake_disable_monday_v1", JSON.stringify(disableMondaySetting));
 } catch(e) {}
 initCalendar();
-console.log("☁️ 成功從 GitHub 同步最新店長日曆！");
-break;
+console.log("☁️ 成功由 Google 試算表同步最新日曆！");
+return;
 }
 }
-} catch(errInner) {}
+} catch(e) {
+console.warn("Google Apps Script 同步失敗，改嘗試本地備案", e);
+}
+}
+
+// 本地備案
+try {
+const res = await fetch(`./calendar_settings.json?_t=${Date.now()}`, { cache: "no-store" });
+if (res.ok) {
+const data = await res.json();
+if (data && data.calendarDateStatus) {
+calendarDateStatus = data.calendarDateStatus;
+if (data.disableMonday !== undefined) disableMondaySetting = data.disableMonday;
+initCalendar();
+}
 }
 } catch(e) {}
 }
@@ -679,9 +685,9 @@ viewYear = todayObj.getFullYear();
 viewMonth = todayObj.getMonth();
 setBrush('open');
 renderAdminCalendar();
-const adminTokenInput = document.getElementById("adminTokenInput");
-if (adminTokenInput) {
-adminTokenInput.value = localStorage.getItem("wuyi_github_token") || GITHUB_TOKEN;
+const adminGasUrlInput = document.getElementById("adminGasUrlInput");
+if (adminGasUrlInput) {
+adminGasUrlInput.value = currentGasUrl;
 }
 } else {
 adminPwdError.classList.remove("hidden");
@@ -697,98 +703,85 @@ verifyPassword();
 }
 });
 
-// ☁️ 儲存並同步至 GitHub API（讓所有客人手機立即生效）
-async function syncToGitHubAPI(statusObj, disableMon) {
-const activeToken = (localStorage.getItem("wuyi_github_token") || GITHUB_TOKEN).trim();
+// ☁️ 儲存並同步至 Google Apps Script（讓所有客人手機立即生效）
+async function syncToGoogleAppsScript(statusObj, disableMon, gasUrl) {
 const payload = {
 updatedAt: new Date().toISOString(),
 disableMonday: disableMon,
 calendarDateStatus: statusObj
 };
-const jsonString = JSON.stringify(payload, null, 2);
-const contentBase64 = btoa(unescape(encodeURIComponent(jsonString)));
 
-// 1. 取得現有檔案的 SHA
-let sha = null;
-try {
-const checkRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${SETTINGS_FILE}`, {
+// 使用 text/plain 發送以避開瀏覽器跨域限制
+const res = await fetch(gasUrl, {
+method: "POST",
 headers: {
-"Authorization": `Bearer ${activeToken}`,
-"Accept": "application/vnd.github.v3+json"
-}
-});
-if (checkRes.ok) {
-const fileJson = await checkRes.json();
-sha = fileJson.sha;
-}
-} catch(e) {}
-
-// 2. PUT 寫入 GitHub
-const body = {
-message: "Update calendar settings via WUYI admin panel",
-content: contentBase64
-};
-if (sha) body.sha = sha;
-
-const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${SETTINGS_FILE}`, {
-method: "PUT",
-headers: {
-"Authorization": `Bearer ${activeToken}`,
-"Accept": "application/vnd.github.v3+json",
-"Content-Type": "application/json"
+"Content-Type": "text/plain;charset=utf-8"
 },
-body: JSON.stringify(body)
+body: JSON.stringify(payload)
 });
 
-if (!putRes.ok) {
-const errData = await putRes.json().catch(() => ({}));
-const status = putRes.status;
-let detailMsg = errData.message || "未知原因";
-if (status === 401) {
-detailMsg = "Token 已過期或無效 (401 Bad credentials)";
-} else if (status === 403 || status === 404) {
-detailMsg = `權限不足 (${status})：Token 必須勾選「repo」權限才能寫入！`;
+if (!res.ok) {
+throw new Error(`Google 服務回應異常 (HTTP ${res.status})`);
 }
-throw new Error(detailMsg);
+const resData = await res.json().catch(() => ({ status: "success" }));
+if (resData.status === "error") {
+throw new Error(resData.message || "Google Apps Script 執行錯誤");
 }
-return await putRes.json();
+return resData;
 }
 
 // 儲存並同步全站
 adminSaveSettingsBtn.addEventListener("click", async function() {
-const adminTokenInput = document.getElementById("adminTokenInput");
-if (adminTokenInput && adminTokenInput.value.trim()) {
-localStorage.setItem("wuyi_github_token", adminTokenInput.value.trim());
+const adminGasUrlInput = document.getElementById("adminGasUrlInput");
+if (adminGasUrlInput && adminGasUrlInput.value.trim()) {
+currentGasUrl = adminGasUrlInput.value.trim();
+try {
+localStorage.setItem("wuyi_gas_url", currentGasUrl);
+} catch(e) {}
 }
+
 const originalBtnText = adminSaveSettingsBtn.innerHTML;
 adminSaveSettingsBtn.disabled = true;
-adminSaveSettingsBtn.innerHTML = `<span>⏳ 正在同步至 GitHub 雲端...</span>`;
+adminSaveSettingsBtn.innerHTML = `<span>⏳ 正在同步至 Google 雲端...</span>`;
 adminSyncStatus.classList.remove("hidden");
 adminSyncStatus.className = "text-[10px] text-center text-amber-600 font-medium";
-adminSyncStatus.innerText = "正在將最新日期發布至 GitHub，請稍候...";
+adminSyncStatus.innerText = "正在儲存設定，請稍候...";
 
 try {
 localStorage.setItem("wuyi_cake_date_status_v1", JSON.stringify(calendarDateStatus));
 localStorage.setItem("wuyi_cake_disable_monday_v1", JSON.stringify(disableMondaySetting));
 } catch(e) {}
 
+if (currentGasUrl) {
 try {
-await syncToGitHubAPI(calendarDateStatus, disableMondaySetting);
+await syncToGoogleAppsScript(calendarDateStatus, disableMondaySetting, currentGasUrl);
 adminSyncStatus.className = "text-[10px] text-center text-emerald-600 font-bold";
-adminSyncStatus.innerText = "✅ 已成功發布至 GitHub！所有客人已即時同步！";
+adminSyncStatus.innerText = "✅ 已成功發布至 Google 試算表！所有客人已即時同步！";
 initCalendar();
 setTimeout(() => {
 closeAdminModal();
-alert("🎉【同步成功】日期已成功發布至 GitHub！\n客人現在打開或重新整理網址，即可看見最新設定！");
+alert("🎉【同步成功】日期已成功發布至 Google 試算表！\n客人現在打開網址即可看見最新排程！");
 fpInstance.open();
-}, 600);
+}, 500);
 } catch(err) {
-console.error("GitHub 同步失敗：", err);
+console.error("Google 同步失敗：", err);
 adminSyncStatus.className = "text-[10px] text-center text-rose-500 font-medium";
-adminSyncStatus.innerText = "⚠️ 雲端同步失敗（但本機已儲存）：" + err.message;
+adminSyncStatus.innerText = "⚠️ Google 雲端同步失敗（但本機已儲存）：" + err.message;
 initCalendar();
-alert("⚠️ 本機已儲存，但上傳至 GitHub 失敗：" + err.message + "\n請確認網路連線或 Token 權限！");
+alert("⚠️ 本機已儲存，但上傳至 Google 失敗：" + err.message + "\n請確認 Google Apps Script 網址與部署權限（需設為所有人 Anyone）！");
 } finally {
+adminSaveSettingsBtn.disabled = false;
+adminSaveSettingsBtn.innerHTML = originalBtnText;
+}
+} else {
+adminSyncStatus.className = "text-[10px] text-center text-amber-600 font-medium";
+adminSyncStatus.innerText = "⚠️ 本機已儲存！若要讓客人手機同步，請在下方展開設定 Google 試算表網址。";
+initCalendar();
+setTimeout(() => {
+closeAdminModal();
+alert("✅ 本機日期設定已儲存！\n\n💡 提示：若要讓所有客人的手機也能自動同步，請在面板最下方展開【🔗 設定 Google 試算表同步網址】並貼上您的 Web App 網址。");
+fpInstance.open();
+}, 500);
 adminSaveSettingsBtn.disabled = false;
 adminSaveSettingsBtn.innerHTML = originalBtnText;
 }
