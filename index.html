@@ -718,16 +718,20 @@ const message =
 蛋糕體顏色：${orderData.cakeColor}
 英文題字：${orderData.lettering}
 其他客製需求：${orderData.customNote}
+
 蛋糕尺寸：${orderData.size}
 蛋糕口味：${orderData.flavor}
-需加購：${orderData.addons}
+
+加購：${orderData.addons}
+
 取貨日期：${orderData.date}
 取貨時間：${orderData.time}
 自取地點：${orderData.location}
-訂購人 LINE 名稱：${orderData.lineName}
+
+訂購人 LINE名稱：${orderData.lineName}
 訂購人姓名：${orderData.name}
-訂購人電話：${orderData.phone}
-圖片提醒：已確認送出後傳送參考圖片報價`;
+訂購人電話：${orderData.phone}`;
+
 const encodedId = encodeURIComponent(LINE_OA_ID);
 const encodedMsg = encodeURIComponent(message);
 const lineUrl = `https://line.me/R/oaMessage/${encodedId}/?${encodedMsg}`;
