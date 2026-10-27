@@ -310,6 +310,36 @@ input, select, textarea {
     <!-- 滾動內容區 -->
     <div class="overflow-y-auto flex-1 pr-1 space-y-3.5 text-xs text-stone-700">
 
+      <!-- 跨專案網站切換總控台 -->
+      <div class="p-3 bg-stone-100 rounded-xl border border-stone-300 space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-bold text-stone-800 flex items-center gap-1.5">
+            <span>🌐</span>
+            <span>選擇要設定的網站：</span>
+          </label>
+          <span id="detectedCurrentBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 font-bold">當前網站</span>
+        </div>
+        
+        <select id="projectRepoSelect" onchange="onProjectSelectChange()" class="w-full border border-stone-300 rounded-lg p-2 bg-white text-xs font-semibold outline-none focus:border-[#62502D]">
+          <option value="a0952015080-netizen/wuyi-order">🎂 客製蛋糕預訂單 (wuyi-order)</option>
+          <option value="a0952015080-netizen/wuyi-cakethisweek">🔥 當週公版蛋糕 (wuyi-cakethisweek)</option>
+          <option value="a0952015080-netizen/wuyi-burger">🍔 漢堡盒蛋糕 (wuyi-burger)</option>
+          <option value="a0952015080-netizen/wuyi-flower2">🌸 鮮花蛋糕 (wuyi-flower2)</option>
+          <option value="custom">✏️ 自訂其他 GitHub 儲存庫...</option>
+        </select>
+        
+        <div id="customRepoField" class="hidden pt-1">
+          <input type="text" id="customRepoInput" placeholder="例如：a0952015080-netizen/my-cake" class="w-full border border-stone-300 rounded p-1.5 bg-white text-xs font-mono" />
+        </div>
+
+        <div class="pt-1.5 border-t border-stone-200">
+          <label class="flex items-start gap-2 cursor-pointer text-[11px] font-bold text-amber-900 bg-amber-50 p-2 rounded-lg border border-amber-300">
+            <input type="checkbox" id="syncAllProjectsCheck" class="mt-0.5 rounded text-[#62502D] w-3.5 h-3.5 shrink-0" />
+            <span>⚡ 一鍵同步套用至全部 4 個網站（全店統一公休/臨時店休時勾選，超方便！）</span>
+          </label>
+        </div>
+      </div>
+
       <!-- 快速通則開關 -->
       <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 space-y-2.5">
         <div class="font-bold text-[#62502D]">常規預約通則設定</div>
@@ -986,6 +1016,49 @@ const cfgBlockMondayCheck = document.getElementById("cfgBlockMonday");
 const adminStatusAlert = document.getElementById("adminStatusAlert");
 const btnSyncGithub = document.getElementById("btnSyncGithub");
 
+// 4 大 GitHub 專案清單
+const ALL_PROJECTS = [
+  { id: "wuyi-order", name: "🎂 客製蛋糕預訂單", repo: "a0952015080-netizen/wuyi-order" },
+  { id: "wuyi-cakethisweek", name: "🔥 當週公版蛋糕", repo: "a0952015080-netizen/wuyi-cakethisweek" },
+  { id: "wuyi-burger", name: "🍔 漢堡盒蛋糕", repo: "a0952015080-netizen/wuyi-burger" },
+  { id: "wuyi-flower2", name: "🌸 鮮花蛋糕", repo: "a0952015080-netizen/wuyi-flower2" }
+];
+
+// 自動依當前網址路徑識別所屬專案
+function detectCurrentRepo() {
+  const path = window.location.pathname.toLowerCase();
+  for (const p of ALL_PROJECTS) {
+    if (path.includes(p.id.toLowerCase())) {
+      return p.repo;
+    }
+  }
+  return localStorage.getItem(GH_REPO_KEY) || "a0952015080-netizen/wuyi-order";
+}
+
+// 專案下拉切換事件
+function onProjectSelectChange() {
+  const sel = document.getElementById("projectRepoSelect");
+  const customField = document.getElementById("customRepoField");
+  const badge = document.getElementById("detectedCurrentBadge");
+  const currentPathRepo = detectCurrentRepo();
+
+  if (sel.value === "custom") {
+    customField.classList.remove("hidden");
+    document.getElementById("customRepoInput").focus();
+    badge.innerText = "自訂專案";
+    badge.className = "text-[10px] px-2 py-0.5 rounded-full bg-stone-200 text-stone-700";
+  } else {
+    customField.classList.add("hidden");
+    if (sel.value === currentPathRepo) {
+      badge.innerText = "📍 本網站";
+      badge.className = "text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold";
+    } else {
+      badge.innerText = "☁️ 遠端網站";
+      badge.className = "text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold";
+    }
+  }
+}
+
 // GitHub 設定元素
 const ghSettingsPanel = document.getElementById("ghSettingsPanel");
 const ghToggleArrow = document.getElementById("ghToggleArrow");
@@ -1023,12 +1096,25 @@ function openAdminDateModal() {
 
   // 載入已儲存的 GitHub Token
   const savedToken = localStorage.getItem(GH_TOKEN_KEY) || "";
-  const savedRepo = localStorage.getItem(GH_REPO_KEY) || "a0952015080-netizen/wuyi-order";
+  const autoRepo = detectCurrentRepo();
   const savedBranch = localStorage.getItem(GH_BRANCH_KEY) || "main";
 
   ghTokenInput.value = savedToken;
-  ghRepoInput.value = savedRepo;
+  ghRepoInput.value = autoRepo;
   ghBranchInput.value = savedBranch;
+
+  // 設定專案下拉選單
+  const projectSelect = document.getElementById("projectRepoSelect");
+  const isKnown = ALL_PROJECTS.some(p => p.repo === autoRepo);
+  if (isKnown) {
+    projectSelect.value = autoRepo;
+    document.getElementById("customRepoField").classList.add("hidden");
+  } else {
+    projectSelect.value = "custom";
+    document.getElementById("customRepoField").classList.remove("hidden");
+    document.getElementById("customRepoInput").value = autoRepo;
+  }
+  onProjectSelectChange();
 
   if (savedToken) {
     ghTokenStatusBadge.innerText = "已設定 Token ✓";
@@ -1153,10 +1239,66 @@ function saveAdminConfigLocalOnly() {
 }
 
 // ==================== 5. 方案三核心：透過 GitHub API 自動更新 schedule.json ====================
+async function pushScheduleFile(token, repo, branch, contentObj) {
+  const filePath = "schedule.json";
+  const getUrl = `https://api.github.com/repos/${repo}/contents/${filePath}?ref=${branch}`;
+  let currentSha = null;
+
+  const getRes = await fetch(getUrl, {
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Accept": "application/vnd.github.v3+json"
+    }
+  });
+
+  if (getRes.ok) {
+    const fileData = await getRes.json();
+    currentSha = fileData.sha;
+  } else if (getRes.status === 401) {
+    throw new Error(`Token 無效或過期，無法存取 ${repo}`);
+  } else if (getRes.status === 403) {
+    throw new Error(`權限不足，無法寫入 ${repo}，請確認 Token 具備 repo 寫入權限！`);
+  } else if (getRes.status === 404) {
+    currentSha = null; // 檔案尚不存在，直接建立
+  }
+
+  const jsonContent = JSON.stringify(contentObj, null, 2);
+  const base64Content = btoa(unescape(encodeURIComponent(jsonContent)));
+
+  const putUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
+  const putBody = {
+    message: `update: 店長更新訂購日期開關 (${new Date().toLocaleDateString('zh-TW')} ${new Date().toLocaleTimeString('zh-TW')})`,
+    content: base64Content,
+    branch: branch
+  };
+  if (currentSha) {
+    putBody.sha = currentSha;
+  }
+
+  const putRes = await fetch(putUrl, {
+    method: "PUT",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Accept": "application/vnd.github.v3+json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(putBody)
+  });
+
+  if (!putRes.ok) {
+    const errData = await putRes.json().catch(() => ({}));
+    throw new Error(`${repo} 推送失敗: ` + (errData.message || putRes.status));
+  }
+
+  return true;
+}
+
 async function syncScheduleToGithub() {
   const token = ghTokenInput.value.trim();
-  const repo = ghRepoInput.value.trim();
   const branch = ghBranchInput.value.trim() || "main";
+  const syncAll = document.getElementById("syncAllProjectsCheck").checked;
+  const selVal = document.getElementById("projectRepoSelect").value;
+  const targetRepo = (selVal === "custom") ? document.getElementById("customRepoInput").value.trim() : selVal;
 
   if (!token) {
     showAdminAlert("請先在下方「GitHub 自動同步設定」貼上您的 GitHub Token 才能自動推送喔！", "error");
@@ -1166,81 +1308,50 @@ async function syncScheduleToGithub() {
     return;
   }
 
+  if (!syncAll && !targetRepo) {
+    showAdminAlert("請選擇或輸入欲更新的 GitHub 儲存庫名稱！", "error");
+    return;
+  }
+
   // 儲存 Token 到本地以便下次免再輸入
   localStorage.setItem(GH_TOKEN_KEY, token);
-  localStorage.setItem(GH_REPO_KEY, repo);
   localStorage.setItem(GH_BRANCH_KEY, branch);
+  if (!syncAll && targetRepo) {
+    localStorage.setItem(GH_REPO_KEY, targetRepo);
+  }
 
   applyTempSettingsToActive();
 
   btnSyncGithub.disabled = true;
   btnSyncGithub.innerHTML = `<span>⏳ 正在連線 GitHub API 更新中...</span>`;
-  showAdminAlert("連線 GitHub API 檢查檔案中...", "info");
 
   try {
-    const filePath = "schedule.json";
-    const getUrl = `https://api.github.com/repos/${repo}/contents/${filePath}?ref=${branch}`;
+    if (syncAll) {
+      // 一鍵同步全部 4 個專案
+      showAdminAlert("正在依序同步 4 個網站...", "info");
+      let successList = [];
 
-    // 1. 取得檔案當前 SHA（若已存在）
-    let currentSha = null;
-    const getRes = await fetch(getUrl, {
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Accept": "application/vnd.github.v3+json"
+      for (let i = 0; i < ALL_PROJECTS.length; i++) {
+        const proj = ALL_PROJECTS[i];
+        showAdminAlert(`正在同步 (${i + 1}/${ALL_PROJECTS.length})：${proj.name}...`, "info");
+        await pushScheduleFile(token, proj.repo, branch, bookingSettings);
+        successList.push(proj.id);
       }
-    });
 
-    if (getRes.ok) {
-      const fileData = await getRes.json();
-      currentSha = fileData.sha;
-    } else if (getRes.status === 401) {
-      throw new Error("GitHub Token 無效或已過期，請確認是否複製正確！");
-    } else if (getRes.status === 404) {
-      // 檔案尚未存在，無 sha 即可直接新增
-      currentSha = null;
-    } else if (getRes.status === 403) {
-      throw new Error("權限不足！請確認您的 Token 有勾選 repo 寫入權限。");
+      showAdminAlert(`🎉 太棒了！已一口氣將最新日期同步至全部 4 個網站！`, "success");
+    } else {
+      // 僅推送至選定的單一專案
+      showAdminAlert(`正在推送到 ${targetRepo}...`, "info");
+      await pushScheduleFile(token, targetRepo, branch, bookingSettings);
+      showAdminAlert(`🎉 成功！已推送到 ${targetRepo}！客人開啟該網站即可看到最新日期！`, "success");
     }
 
-    // 2. 送出 PUT 請求更新 schedule.json
-    showAdminAlert("正在將最新日期推送到 GitHub...", "info");
-    const jsonContent = JSON.stringify(bookingSettings, null, 2);
-    // Base64 編碼支援中文與 Unicode
-    const base64Content = btoa(unescape(encodeURIComponent(jsonContent)));
-
-    const putUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
-    const putBody = {
-      message: `update: 店長更新公版訂購日期 (${new Date().toLocaleDateString('zh-TW')} ${new Date().toLocaleTimeString('zh-TW')})`,
-      content: base64Content,
-      branch: branch
-    };
-    if (currentSha) {
-      putBody.sha = currentSha;
-    }
-
-    const putRes = await fetch(putUrl, {
-      method: "PUT",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Accept": "application/vnd.github.v3+json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(putBody)
-    });
-
-    if (!putRes.ok) {
-      const errData = await putRes.json().catch(() => ({}));
-      throw new Error(errData.message || `GitHub API 回傳錯誤碼: ${putRes.status}`);
-    }
-
-    // 成功！
-    showAdminAlert("🎉 成功！已自動推送到 GitHub！客人開啟同一連結即會載入最新日期！", "success");
     ghTokenStatusBadge.innerText = "已設定 Token ✓";
     ghTokenStatusBadge.className = "text-[10px] px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-800 font-semibold";
 
     setTimeout(() => {
       closeAdminDateModal();
-    }, 2000);
+    }, 2200);
 
   } catch (err) {
     console.error("同步至 GitHub 失敗", err);
@@ -1252,6 +1363,7 @@ async function syncScheduleToGithub() {
       <span>儲存並自動推送到 GitHub（同網址生效）</span>
     `;
   }
+}
 }
 
 // 狀態提示框渲染
