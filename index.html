@@ -880,9 +880,16 @@ function handleTripleClickTrigger() {
   }
 }
 
-// 綁定頂部橫幅圖片與標題蛋糕按鈕
+// 綁定頂部橫幅圖片與標題蛋糕按鈕，以及支援點擊照片進入
 document.getElementById("headerCakeImg")?.addEventListener("click", handleTripleClickTrigger);
 document.getElementById("titleCakeBtn")?.addEventListener("click", handleTripleClickTrigger);
+
+// 任何公版照片如果點 3 下也能觸發店長管理
+document.addEventListener("click", (e) => {
+  if (e.target && e.target.classList && e.target.classList.contains("cake-photo-img")) {
+    handleTripleClickTrigger();
+  }
+});
 
 // 密碼驗證
 const adminPasswordModal = document.getElementById("adminPasswordModal");
