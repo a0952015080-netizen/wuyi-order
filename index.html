@@ -46,3 +46,705 @@ font-size: 16px !important;
 <a id="lineManualBtn" href="https://a0952015080-netizen.github.io/wuyi-order/#" target="_blank" rel="noopener noreferrer" class="inline-block w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-3.5 rounded-xl shadow transition duration-200 text-sm">
 👉 若未自動跳轉，請點此開啟 LINE
 </a>
+</div>
+</div>
+<!-- 一頁式表單本體 -->
+<form id="cakeOrderForm" class="space-y-2.5">
+<!-- 1. 尺寸與口味並排 -->
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block text-xs font-semibold mb-1 text-stone-700">蛋糕尺寸 <span class="text-red-500">*</span></label>
+<select id="size" required class="w-full border border-stone-300 rounded-lg p-2 bg-white outline-none focus:border-stone-600 text-xs">
+<option value="">選擇尺寸</option>
+<option value="漢堡盒 (4吋一層夾餡)">漢堡盒 (4吋一層)</option>
+<option value="4 吋整模 (兩層夾餡)">4 吋整模 (兩層)</option>
+<option value="6 吋整模 (兩層夾餡)">6 吋整模 (兩層)</option>
+<option value="8 吋整模 (兩層夾餡)">8 吋整模 (兩層)</option>
+</select>
+</div>
+<div>
+<label class="block text-xs font-semibold mb-1 text-stone-700">蛋糕口味 <span class="text-red-500">*</span></label>
+<select id="flavor" required class="w-full border border-stone-300 rounded-lg p-2 bg-white outline-none focus:border-stone-600 text-xs">
+<option value="">先選尺寸</option>
+</select>
+</div>
+</div>
+<p id="flavorHint" class="text-[10px] text-amber-700 hidden"></p>
+<!-- 2. 需加購項目（已加入互斥防呆） -->
+<div>
+<label class="block text-xs font-semibold mb-1 text-stone-700">需加購（可複選）</label>
+<div class="grid grid-cols-2 gap-1.5 text-xs text-stone-600 bg-stone-50 p-2 rounded-xl border border-stone-200">
+<label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="2人餐具 $15" class="rounded" /> 2人餐具 $15</label>
+<label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="5人餐具 $30" class="rounded" /> 5人餐具 $30</label>
+<label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="10人餐具 $50" class="rounded" /> 10人餐具 $50</label>
+<label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="生日插牌／蠟燭" class="rounded" /> 生日插牌／蠟燭</label>
+<label class="flex items-center gap-1.5"><input type="checkbox" id="candleCheckbox" name="addons" value="數字蠟燭 $30/支" class="rounded" /> 數字蠟燭 $30/支</label>
+<label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="保冰袋/劑 $100" class="rounded" /> 保冰袋/劑 $100</label>
+<label class="flex items-center gap-1.5 col-span-2"><input type="checkbox" id="noAddonsCheckbox" name="addons" value="無" class="rounded" /> 無加購</label>
+</div>
+<!-- 數字蠟燭歲數欄 -->
+<div id="candleField" class="hidden mt-1 p-2 bg-amber-50 rounded-lg border border-amber-200">
+<label class="block text-[11px] font-semibold text-amber-900 mb-0.5">🕯️ 數字蠟燭歲數（必填歲數或填問號）：<span class="text-red-500">*</span></label>
+<input type="text" id="candleDetail" placeholder="例如：28 歲、數字 8、或問號" class="w-full border border-amber-300 rounded p-1.5 bg-white outline-none text-xs" />
+</div>
+</div>
+<!-- 3. 取貨日期與時間並排 -->
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block text-xs font-semibold mb-1 text-stone-700">取貨日期 <span class="text-red-500">*</span></label>
+<input type="text" id="date" placeholder="點擊選擇日期" required readonly class="w-full border border-stone-300 rounded-lg p-2 bg-white cursor-pointer outline-none focus:border-stone-600 text-xs" />
+</div>
+<div>
+<label class="block text-xs font-semibold mb-1 text-stone-700">取貨時間 <span class="text-red-500">*</span></label>
+<select id="time" required class="w-full border border-stone-300 rounded-lg p-2 bg-white outline-none focus:border-stone-600 text-xs">
+<option value="">選擇時間</option>
+<option value="15:00">15:00</option>
+<option value="15:30">15:30</option>
+<option value="16:00">16:00</option>
+<option value="16:30">16:30</option>
+<option value="17:00">17:00</option>
+<option value="17:30">17:30</option>
+<option value="18:00">18:00</option>
+<option value="18:30">18:30</option>
+<option value="19:00">19:00</option>
+</select>
+</div>
+</div>
+<!-- 提前預訂防呆與地點 -->
+<div id="bookingRulesInfo" class="p-2 bg-amber-50 rounded-lg border border-amber-200 text-[11px] text-amber-800 space-y-0.5">
+<div>⏳ <strong>預訂須知：</strong>手作新鮮蛋糕<span id="ruleDaysText"><strong>需提前一週預約</strong></span><br>（每日 18:00 截單；週一固定公休）。</div>
+<div>📍 <strong>自取地點：</strong>台南市中西區友愛街93號</div>
+</div>
+<!-- 4. 訂購人資訊（加強手機格式防呆） -->
+<div class="space-y-2 pt-1 border-t border-stone-100">
+<div>
+<label class="block text-xs font-semibold mb-0.5 text-stone-700">訂購人 LINE 名稱 <span class="text-red-500">*</span></label>
+<input type="text" id="lineName" required placeholder="請填寫您 LINE 的顯示暱稱" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs" />
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block text-xs font-semibold mb-0.5 text-stone-700">訂購人姓名 <span class="text-red-500">*</span></label>
+<input type="text" id="name" required placeholder="王小明" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs" />
+</div>
+<div>
+<label class="block text-xs font-semibold mb-0.5 text-stone-700">訂購人電話 <span class="text-red-500">*</span></label>
+<input type="tel" id="phone" required placeholder="0912345678" maxlength="11" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs" />
+</div>
+</div>
+</div>
+<!-- 圖片提醒打勾（必勾選） -->
+<div class="p-2.5 bg-rose-50 rounded-xl border border-rose-200">
+<label class="flex items-start gap-2 cursor-pointer text-xs text-rose-900 font-medium">
+<input type="checkbox" id="photoConfirm" required class="mt-0.5 rounded text-rose-600 w-4 h-4" />
+<span>我已了解：送出訂單後，請在 LINE 聊天室<strong>傳送參考圖片最多三款</strong>以利報價 <span class="text-red-500">*</span></span>
+</label>
+</div>
+<!-- 5. 三個選填客製項目（加上字數限制防呆） -->
+<div class="space-y-2 p-2.5 bg-stone-50 rounded-xl border border-stone-200">
+<div>
+<label class="block text-[11px] font-semibold text-stone-700 mb-0.5">想要的蛋糕體顏色（選填）</label>
+<input type="text" id="cakeColor" maxlength="40" placeholder="例如：如圖款,粉,藍,紫,灰,白(或LINE討論)" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs bg-white" />
+</div>
+<div>
+<label class="block text-[11px] font-semibold text-stone-700 mb-0.5">英文題字內容（選填，限英文最多2-3字）</label>
+<input type="text" id="lettering" maxlength="30" placeholder="例如：Happy Birthday,HBD" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs bg-white" />
+</div>
+<div>
+<label class="block text-[11px] font-semibold text-stone-700 mb-0.5">其他客製需求（選填）</label>
+<input type="text" id="customNote" maxlength="50" placeholder="如有其他特殊小細節可在此填寫" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs bg-white" />
+</div>
+</div>
+<!-- 6. 送出按鈕 -->
+<div class="pt-1">
+<button type="submit" id="submitBtn" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-3 rounded-xl shadow transition duration-200 flex items-center justify-center gap-1.5 text-sm">
+<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.035 9.608.391.082.922.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975 1.766-1.972 2.548-3.957 2.548-5.968z"/></svg>
+透過 LINE 送出訂單
+</button>
+</div>
+</form>
+</div>
+<!-- 🎂 管理員彈窗：密碼驗證 & 👑 店長模式日期按鈕設定面板 -->
+<div id="adminModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3 sm:p-4">
+<div class="bg-white rounded-2xl max-w-sm sm:max-w-md w-full p-4 sm:p-5 shadow-2xl border border-stone-200 space-y-3.5 max-h-[95vh] overflow-y-auto">
+<!-- 步驟 1: 輸入密碼 5151 -->
+<div id="adminStepAuth" class="space-y-3">
+<div class="flex items-center justify-between border-b pb-2">
+<h3 class="text-sm font-bold text-stone-800 flex items-center gap-1">
+<span>🎂</span> 驗證店長密碼
+</h3>
+<button type="button" id="adminCloseAuthBtn" class="text-stone-400 hover:text-stone-600 text-lg leading-none">&times;</button>
+</div>
+<p class="text-xs text-stone-600">請輸入管理密碼進入店長日期設定：</p>
+<div>
+<input type="password" id="adminPwdInput" inputmode="numeric" placeholder="請輸入管理密碼" class="w-full border border-stone-300 rounded-lg p-2.5 text-center text-sm font-mono tracking-widest outline-none focus:border-amber-600" />
+<p id="adminPwdError" class="text-[11px] text-red-500 mt-1 hidden text-center">密碼錯誤，請重新輸入！</p>
+</div>
+<div class="grid grid-cols-2 gap-2 pt-1">
+<button type="button" id="adminCancelAuthBtn" class="w-full py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-semibold">取消</button>
+<button type="button" id="adminVerifyBtn" class="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-semibold">進入店長模式</button>
+</div>
+</div>
+<!-- 步驟 2: 👑 店長模式 日曆可預訂/不可預訂 點擊設定面板 -->
+<div id="adminStepPanel" class="hidden space-y-3">
+<div class="flex items-center justify-between border-b pb-2">
+<div>
+<h3 class="text-sm font-bold text-stone-800 flex items-center gap-1">
+<span>👑</span> 店長模式：日期開放管理
+</h3>
+<p class="text-[11px] text-stone-500">預設開放一個月，可自由點擊日期設定可訂或公休</p>
+</div>
+<button type="button" id="adminClosePanelBtn" class="text-stone-400 hover:text-stone-600 text-lg leading-none">&times;</button>
+</div>
+<!-- ⚡ 一鍵急件解鎖捷徑 -->
+<div class="p-2.5 bg-amber-50 rounded-xl border border-amber-200">
+<button type="button" id="quickUnlockAllBtn" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 active:scale-[0.99] text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center gap-1.5">
+<span>⚡</span> 一鍵急件解鎖（今天起所有日期皆可預訂）
+</button>
+<p class="text-[10px] text-amber-700 text-center mt-1">立刻解除提前一週、週一公休與特定公休限制，急單首選</p>
+</div>
+<!-- 🚫 週一公休開關 -->
+<div class="bg-stone-50 p-2.5 rounded-xl border border-stone-200 flex items-center justify-between">
+<div>
+<label for="settingDisableMonday" class="text-xs font-bold text-stone-700 flex items-center gap-1 cursor-pointer">
+<span>🚫</span> 阻擋週一固定公休
+</label>
+<p class="text-[10px] text-stone-500">取消勾選後即可開放客人選擇週一取貨</p>
+</div>
+<input type="checkbox" id="settingDisableMonday" checked class="w-4 h-4 text-amber-600 rounded cursor-pointer" />
+</div>
+<!-- 點選模式按鈕：可以預訂 vs 不可以預訂 -->
+<div class="space-y-1">
+<label class="block text-xs font-semibold text-stone-700">用按的設定日期（選取動作後點擊日曆）：</label>
+<div class="grid grid-cols-2 gap-2">
+<button type="button" id="brushOpenBtn" class="py-2 px-2 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-1.5 transition bg-emerald-50 border-emerald-500 text-emerald-800 shadow-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+按了設為【可以預訂】
+</button>
+<button type="button" id="brushClosedBtn" class="py-2 px-2 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-1.5 transition bg-white border-stone-200 text-stone-600 hover:bg-rose-50 hover:border-rose-300">
+<span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
+按了設為【不可預訂】
+</button>
+</div>
+</div>
+<!-- 月份切換導航 -->
+<div class="flex items-center justify-between bg-stone-50 p-2 rounded-xl border border-stone-200">
+<button type="button" id="prevMonthBtn" class="p-1 px-2.5 bg-white border border-stone-300 rounded-lg text-xs font-bold text-stone-700 hover:bg-stone-100">&lt; 上個月</button>
+<span id="calendarMonthTitle" class="text-xs font-bold text-stone-800">2026 年 10 月</span>
+<button type="button" id="nextMonthBtn" class="p-1 px-2.5 bg-white border border-stone-300 rounded-lg text-xs font-bold text-stone-700 hover:bg-stone-100">下個月 &gt;</button>
+</div>
+<!-- 星期表頭 -->
+<div class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-stone-500">
+<span class="text-rose-500">日</span>
+<span>一</span>
+<span>二</span>
+<span>三</span>
+<span>四</span>
+<span>五</span>
+<span class="text-amber-600">六</span>
+</div>
+<!-- 日曆格子本體（用按的） -->
+<div id="calendarGrid" class="grid grid-cols-7 gap-1 text-center select-none">
+<!-- JS 動態生成日期格子 -->
+</div>
+<!-- 快捷批次操作 -->
+<div class="pt-1 flex items-center justify-between text-[11px] text-stone-500 border-t border-stone-100">
+<div class="flex items-center gap-2">
+<span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-500 inline-block"></span>可訂</span>
+<span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-rose-400 inline-block"></span>休假/滿</span>
+</div>
+<div class="flex items-center gap-2">
+<button type="button" id="adminQuickAllOpenBtn" class="text-emerald-700 font-bold hover:underline">⚡ 本月全開</button>
+<button type="button" id="adminQuickMonCloseBtn" class="text-stone-600 hover:underline">🚫 週一全休</button>
+</div>
+</div>
+<!-- 儲存與恢復按鈕 -->
+<div class="grid grid-cols-2 gap-2 pt-2 border-t border-stone-100">
+<button type="button" id="adminResetDefaultBtn" class="w-full py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-semibold">恢復原廠預設</button>
+<button type="button" id="adminSaveSettingsBtn" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md">儲存並套用日曆</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+const LINE_OA_ID = "@230fpemy";
+// 預設公休與預約規則（預設開放一個月、提前一週預約、週一固定公休）
+const DEFAULT_CLOSED_DATES = ["2026-10-27", "2026-11-24", "2026-12-01"];
+let defaultPreorderDays = 7;
+const currentHour = new Date().getHours();
+if (currentHour >= 18) {
+defaultPreorderDays += 1; // 超過傍晚 18:00 截單，需多加 1 天備料
+}
+// 阻擋週一固定公休開關狀態（預設開啟阻擋）
+let disableMondaySetting = true;
+try {
+const savedMon = localStorage.getItem("wuyi_cake_disable_monday_v1");
+if (savedMon !== null) {
+disableMondaySetting = JSON.parse(savedMon);
+}
+} catch(e) {}
+// 儲存店長自訂的日期狀態 (key: "YYYY-MM-DD", value: "open" | "closed")
+let calendarDateStatus = {};
+try {
+const saved = localStorage.getItem("wuyi_cake_date_status_v1");
+if (saved) {
+calendarDateStatus = JSON.parse(saved);
+}
+} catch(e) {}
+const standardFlavors = [
+"A 原味戚風＋藍莓果醬&藍莓＋豆乳奶凍＋原味奶油",
+"B 可可戚風＋當季水果＋Oreo巧克力脆＋Oreo鹹奶油",
+"C 伯爵戚風＋鹽之花焦糖核桃＋可可奶凍＋原味奶油",
+"D 焙茶戚風＋當季水果＋芝麻奶凍＋原味奶油",
+"E 檸檬戚風＋當季水果＋焙茶奶凍＋原味奶油",
+"F 可可戚風＋可可奶凍＋Oreo巧克力脆＋原味奶油"
+];
+const burgerFlavors = [
+"1. 原味戚風＋當季水果＋原味奶油",
+"2. 可可戚風＋Oreo巧克力脆＋原味奶油",
+"3. 伯爵戚風＋鹽之花焦糖核桃＋原味奶油",
+"4. 焙茶戚風＋當季水果＋原味奶油"
+];
+const sizeSelect = document.getElementById("size");
+const flavorSelect = document.getElementById("flavor");
+const flavorHint = document.getElementById("flavorHint");
+const candleCheckbox = document.getElementById("candleCheckbox");
+const candleField = document.getElementById("candleField");
+const candleDetail = document.getElementById("candleDetail");
+const noAddonsCheckbox = document.getElementById("noAddonsCheckbox");
+const otherAddons = document.querySelectorAll('input[name="addons"]:not(#noAddonsCheckbox)');
+// 加購項目互斥防呆
+noAddonsCheckbox.addEventListener("change", function() {
+if (this.checked) {
+otherAddons.forEach(cb => { cb.checked = false; });
+candleField.classList.add("hidden");
+candleDetail.value = "";
+}
+});
+otherAddons.forEach(cb => {
+cb.addEventListener("change", function() {
+if (this.checked && noAddonsCheckbox.checked) {
+noAddonsCheckbox.checked = false;
+}
+});
+});
+// 數字蠟燭展開
+candleCheckbox.addEventListener("change", function() {
+if (this.checked) {
+candleField.classList.remove("hidden");
+candleDetail.focus();
+} else {
+candleField.classList.add("hidden");
+candleDetail.value = "";
+}
+});
+// 格式化 YYYY-MM-DD
+const formatYMD = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+// 取得日期的預設開放狀態（若店長未手動點選覆蓋）
+function getDefaultStatus(dStr) {
+const parts = dStr.split('-');
+const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+const today = new Date();
+today.setHours(0,0,0,0);
+d.setHours(0,0,0,0);
+// 過去日期不可選
+if (d < today) return 'past';
+// 預設開放一個月範圍（超過一個月預設為 closed）
+const oneMonthAhead = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+if (d > oneMonthAhead) return 'closed';
+// 提前一週預約防呆（需提前 7 天）
+const diffTime = d.getTime() - today.getTime();
+const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
+if (diffDays < defaultPreorderDays) return 'closed';
+// 🚫 週一固定公休開關（勾選時阻擋週一，取消勾選則開放週一）
+if (disableMondaySetting && d.getDay() === 1) return 'closed';
+// 特定公休日
+if (DEFAULT_CLOSED_DATES.includes(dStr)) return 'closed';
+return 'open';
+}
+// 初始化與重建客人預訂日曆
+let fpInstance = null;
+function initCalendar() {
+const now = new Date();
+now.setHours(0,0,0,0);
+// 預設開放一個月日期
+let maxBookingDate = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
+// 若店長在一個月外有額外設定「可預訂」，自動延伸上限至該日期
+for (const dStr in calendarDateStatus) {
+if (calendarDateStatus[dStr] === 'open') {
+const parts = dStr.split('-');
+const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+if (d > maxBookingDate) maxBookingDate = d;
+}
+}
+if (fpInstance) {
+fpInstance.destroy();
+}
+fpInstance = flatpickr("#date", {
+locale: {
+firstDayOfWeek: 0,
+weekdays: { shorthand: ["日", "一", "二", "三", "四", "五", "六"], longhand: ["週日", "週一", "週二", "週三", "週四", "週五", "週六"] },
+months: { shorthand: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"], longhand: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"] }
+},
+minDate: formatYMD(now),
+maxDate: formatYMD(maxBookingDate),
+dateFormat: "Y-m-d",
+disable: [
+function(date) {
+const dStr = formatYMD(date);
+const status = calendarDateStatus[dStr] !== undefined ? calendarDateStatus[dStr] : getDefaultStatus(dStr);
+return status !== 'open'; // 只要不是 open 一律禁止點選
+}
+]
+});
+}
+// 初次啟動日曆
+initCalendar();
+// 尺寸連動口味
+sizeSelect.addEventListener("change", function() {
+const val = this.value;
+flavorSelect.innerHTML = '<option value="">請選擇口味</option>';
+if (val.includes("整模")) {
+flavorHint.classList.remove("hidden");
+flavorHint.innerText = "✨ 口味固定，當季水果為藍莓或綠葡萄";
+standardFlavors.forEach(item => {
+const opt = document.createElement("option");
+opt.value = item;
+opt.textContent = item;
+flavorSelect.appendChild(opt);
+});
+} else if (val.includes("漢堡盒")) {
+flavorHint.classList.remove("hidden");
+flavorHint.innerText = "✨ 口味固定，當季水果為藍莓或綠葡萄";
+burgerFlavors.forEach(item => {
+const opt = document.createElement("option");
+opt.value = item;
+opt.textContent = item;
+flavorSelect.appendChild(opt);
+});
+} else {
+flavorHint.classList.add("hidden");
+flavorSelect.innerHTML = '<option value="">先選尺寸</option>';
+}
+});
+// ============================================
+// 🎂 蛋糕圖案點擊 -> 密碼驗證 5151 -> 👑 店長模式
+// ============================================
+const adminCakeBtn = document.getElementById("adminCakeBtn");
+const adminModal = document.getElementById("adminModal");
+const adminStepAuth = document.getElementById("adminStepAuth");
+const adminStepPanel = document.getElementById("adminStepPanel");
+const adminPwdInput = document.getElementById("adminPwdInput");
+const adminPwdError = document.getElementById("adminPwdError");
+const adminVerifyBtn = document.getElementById("adminVerifyBtn");
+const adminCancelAuthBtn = document.getElementById("adminCancelAuthBtn");
+const adminCloseAuthBtn = document.getElementById("adminCloseAuthBtn");
+const adminClosePanelBtn = document.getElementById("adminClosePanelBtn");
+const quickUnlockAllBtn = document.getElementById("quickUnlockAllBtn");
+const settingDisableMonday = document.getElementById("settingDisableMonday");
+const brushOpenBtn = document.getElementById("brushOpenBtn");
+const brushClosedBtn = document.getElementById("brushClosedBtn");
+const prevMonthBtn = document.getElementById("prevMonthBtn");
+const nextMonthBtn = document.getElementById("nextMonthBtn");
+const calendarMonthTitle = document.getElementById("calendarMonthTitle");
+const calendarGrid = document.getElementById("calendarGrid");
+const adminQuickAllOpenBtn = document.getElementById("adminQuickAllOpenBtn");
+const adminQuickMonCloseBtn = document.getElementById("adminQuickMonCloseBtn");
+const adminSaveSettingsBtn = document.getElementById("adminSaveSettingsBtn");
+const adminResetDefaultBtn = document.getElementById("adminResetDefaultBtn");
+// 當前筆刷動作：'open'（可以預訂） 或 'closed'（不可預訂）
+let currentBrush = 'open';
+// 瀏覽的年月
+const todayObj = new Date();
+let viewYear = todayObj.getFullYear();
+let viewMonth = todayObj.getMonth();
+// 切換筆刷狀態樣式
+function setBrush(mode) {
+currentBrush = mode;
+if (mode === 'open') {
+brushOpenBtn.className = "py-2 px-2 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-1.5 transition bg-emerald-50 border-emerald-500 text-emerald-800 shadow-sm";
+brushClosedBtn.className = "py-2 px-2 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-1.5 transition bg-white border-stone-200 text-stone-600 hover:bg-rose-50 hover:border-rose-300";
+} else {
+brushClosedBtn.className = "py-2 px-2 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-1.5 transition bg-rose-50 border-rose-500 text-rose-800 shadow-sm";
+brushOpenBtn.className = "py-2 px-2 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-1.5 transition bg-white border-stone-200 text-stone-600 hover:bg-emerald-50 hover:border-emerald-300";
+}
+}
+brushOpenBtn.addEventListener("click", () => setBrush('open'));
+brushClosedBtn.addEventListener("click", () => setBrush('closed'));
+// 🚫 週一公休開關切換
+settingDisableMonday.addEventListener("change", function() {
+disableMondaySetting = this.checked;
+renderAdminCalendar();
+});
+// ⚡ 一鍵急件解鎖：立刻解除提前一週、週一公休與公休限制
+quickUnlockAllBtn.addEventListener("click", function() {
+disableMondaySetting = false;
+settingDisableMonday.checked = false;
+const today = new Date();
+today.setHours(0,0,0,0);
+const oneMonthAhead = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+// 將今天起到一個月內所有日期皆標記為 open
+for (let d = new Date(today); d <= oneMonthAhead; d.setDate(d.getDate() + 1)) {
+const dStr = formatYMD(d);
+calendarDateStatus[dStr] = 'open';
+}
+renderAdminCalendar();
+alert("🎉 已一鍵解鎖！今天起到未來一個月的所有日期皆可預訂（包含今天、明天、週一與公休日）。\n請點擊下方「儲存並套用日曆」即可生效！");
+});
+// 渲染店長日曆表格（用按的）
+function renderAdminCalendar() {
+calendarMonthTitle.innerText = `${viewYear} 年 ${viewMonth + 1} 月`;
+calendarGrid.innerHTML = "";
+const firstDayIndex = new Date(viewYear, viewMonth, 1).getDay();
+const totalDays = new Date(viewYear, viewMonth + 1, 0).getDate();
+const today = new Date();
+today.setHours(0,0,0,0);
+// 補上月初空白格
+for (let i = 0; i < firstDayIndex; i++) {
+const emptyCell = document.createElement("div");
+emptyCell.className = "h-11";
+calendarGrid.appendChild(emptyCell);
+}
+// 逐日渲染
+for (let day = 1; day <= totalDays; day++) {
+const dStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+const thisDate = new Date(viewYear, viewMonth, day);
+thisDate.setHours(0,0,0,0);
+const isPast = thisDate < today;
+const cell = document.createElement("div");
+cell.className = "h-11 rounded-lg flex flex-col items-center justify-center transition p-0.5";
+if (isPast) {
+cell.className += " bg-stone-100 text-stone-300 cursor-not-allowed border border-transparent";
+cell.innerHTML = `<span class="text-xs">${day}</span><span class="text-[9px] leading-none">-</span>`;
+} else {
+const status = calendarDateStatus[dStr] !== undefined ? calendarDateStatus[dStr] : getDefaultStatus(dStr);
+cell.dataset.date = dStr;
+if (status === 'open') {
+cell.className += " bg-emerald-50 text-emerald-800 border-2 border-emerald-400 font-bold hover:brightness-95 cursor-pointer shadow-xs";
+cell.innerHTML = `<span class="text-xs leading-tight">${day}</span><span class="text-[9px] text-emerald-600 leading-none font-medium">可訂</span>`;
+} else {
+cell.className += " bg-rose-50 text-rose-500 border border-rose-200 hover:brightness-95 cursor-pointer line-through";
+cell.innerHTML = `<span class="text-xs leading-tight">${day}</span><span class="text-[9px] text-rose-400 leading-none no-underline font-medium">休</span>`;
+}
+// 點擊事件：直接用按的切換狀態！
+cell.addEventListener("click", function() {
+const currentStatus = calendarDateStatus[dStr] !== undefined ? calendarDateStatus[dStr] : getDefaultStatus(dStr);
+if (currentStatus !== currentBrush) {
+calendarDateStatus[dStr] = currentBrush;
+} else {
+calendarDateStatus[dStr] = currentBrush === 'open' ? 'closed' : 'open';
+}
+renderAdminCalendar();
+});
+}
+calendarGrid.appendChild(cell);
+}
+}
+// 月份切換按鈕
+prevMonthBtn.addEventListener("click", function() {
+viewMonth--;
+if (viewMonth < 0) {
+viewMonth = 11;
+viewYear--;
+}
+renderAdminCalendar();
+});
+nextMonthBtn.addEventListener("click", function() {
+viewMonth++;
+if (viewMonth > 11) {
+viewMonth = 0;
+viewYear++;
+}
+renderAdminCalendar();
+});
+// 快捷操作：本月全開
+adminQuickAllOpenBtn.addEventListener("click", function() {
+const totalDays = new Date(viewYear, viewMonth + 1, 0).getDate();
+const today = new Date();
+today.setHours(0,0,0,0);
+for (let day = 1; day <= totalDays; day++) {
+const thisDate = new Date(viewYear, viewMonth, day);
+thisDate.setHours(0,0,0,0);
+if (thisDate >= today) {
+const dStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+calendarDateStatus[dStr] = 'open';
+}
+}
+renderAdminCalendar();
+});
+// 快捷操作：週一全休
+adminQuickMonCloseBtn.addEventListener("click", function() {
+const totalDays = new Date(viewYear, viewMonth + 1, 0).getDate();
+const today = new Date();
+today.setHours(0,0,0,0);
+for (let day = 1; day <= totalDays; day++) {
+const thisDate = new Date(viewYear, viewMonth, day);
+thisDate.setHours(0,0,0,0);
+if (thisDate >= today && thisDate.getDay() === 1) {
+const dStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+calendarDateStatus[dStr] = 'closed';
+}
+}
+renderAdminCalendar();
+});
+// 全形轉半形
+function toHalfWidth(str) {
+return (str || "").replace(/[０-９]/g, function(c) {
+return String.fromCharCode(c.charCodeAt(0) - 0xfee0);
+}).trim();
+}
+// 點擊蛋糕圖案開啟彈窗
+adminCakeBtn.addEventListener("click", function() {
+adminModal.classList.remove("hidden");
+adminStepAuth.classList.remove("hidden");
+adminStepPanel.classList.add("hidden");
+adminPwdError.classList.add("hidden");
+adminPwdInput.value = "";
+setTimeout(() => adminPwdInput.focus(), 100);
+});
+// 關閉彈窗
+function closeAdminModal() {
+adminModal.classList.add("hidden");
+adminPwdInput.value = "";
+adminPwdError.classList.add("hidden");
+}
+adminCancelAuthBtn.addEventListener("click", closeAdminModal);
+adminCloseAuthBtn.addEventListener("click", closeAdminModal);
+adminClosePanelBtn.addEventListener("click", closeAdminModal);
+// 驗證密碼 5151
+function verifyPassword() {
+const pwd = toHalfWidth(adminPwdInput.value);
+if (pwd === "5151") {
+adminStepAuth.classList.add("hidden");
+adminStepPanel.classList.remove("hidden");
+settingDisableMonday.checked = disableMondaySetting;
+viewYear = todayObj.getFullYear();
+viewMonth = todayObj.getMonth();
+setBrush('open');
+renderAdminCalendar();
+} else {
+adminPwdError.classList.remove("hidden");
+adminPwdInput.focus();
+adminPwdInput.select();
+}
+}
+adminVerifyBtn.addEventListener("click", verifyPassword);
+adminPwdInput.addEventListener("keydown", function(e) {
+if (e.key === "Enter") {
+e.preventDefault();
+verifyPassword();
+}
+});
+// 儲存並套用日曆
+adminSaveSettingsBtn.addEventListener("click", function() {
+try {
+localStorage.setItem("wuyi_cake_date_status_v1", JSON.stringify(calendarDateStatus));
+localStorage.setItem("wuyi_cake_disable_monday_v1", JSON.stringify(disableMondaySetting));
+} catch(e) {}
+initCalendar();
+closeAdminModal();
+setTimeout(() => {
+alert("✅ 日期開放設定已儲存！客人預訂時只能點選您標記為【可訂】的日期。");
+fpInstance.open();
+}, 150);
+});
+// 恢復原廠預設值（預設開放一個月、提前一週預約、週一固定公休）
+function resetToDefault() {
+calendarDateStatus = {};
+disableMondaySetting = true;
+settingDisableMonday.checked = true;
+try {
+localStorage.removeItem("wuyi_cake_date_status_v1");
+localStorage.removeItem("wuyi_cake_disable_monday_v1");
+} catch(e) {}
+initCalendar();
+renderAdminCalendar();
+closeAdminModal();
+alert("🔄 已成功恢復為預設規則（預設開放一個月、需提前一週預約、週一固定公休）！");
+}
+adminResetDefaultBtn.addEventListener("click", resetToDefault);
+// ============================================
+// 表單送出前「全面嚴格驗證」
+// ============================================
+document.getElementById("cakeOrderForm").addEventListener("submit", function(e) {
+e.preventDefault();
+// 1. 蠟燭必填歲數驗證
+if (candleCheckbox.checked && candleDetail.value.trim() === "") {
+alert("⚠️ 您有加購數字蠟燭，請填寫需要的歲數（或問號）喔！若不需要請取消勾選蠟燭。");
+candleDetail.focus();
+return;
+}
+// 2. 手機號碼格式驗證（必須為 09 開頭共 10 碼）
+const phoneInput = document.getElementById("phone");
+const cleanPhone = phoneInput.value.replace(/[-\s]/g, "");
+const phoneRegex = /^09\d{8}$/;
+if (!phoneRegex.test(cleanPhone)) {
+alert("⚠️ 請填寫正確的手機號碼（共 10 碼，例如：0912345678）！");
+phoneInput.focus();
+return;
+}
+// 3. 英文題字中文字檢查防呆
+const letteringInput = document.getElementById("lettering");
+const letteringVal = letteringInput.value.trim();
+if (/[\u4e00-\u9fa5]/.test(letteringVal)) {
+alert("⚠️ 提醒您：題字目前僅提供英文（最多2-3個字，如 HBD），暫無提供中文題字喔！請修改後再送出。");
+letteringInput.focus();
+return;
+}
+// 處理加購項目
+let selectedAddons = Array.from(document.querySelectorAll('input[name="addons"]:checked')).map(el => el.value);
+if (candleCheckbox.checked && candleDetail.value.trim() !== "") {
+selectedAddons = selectedAddons.map(item => item.includes("數字蠟燭") ? `數字蠟燭 $30/支 (${candleDetail.value.trim()})` : item);
+}
+const addonsText = selectedAddons.length > 0 ? selectedAddons.join("、") : "無";
+const cakeColor = document.getElementById("cakeColor").value.trim() || "無 / LINE討論";
+const lettering = letteringVal || "無";
+const customNote = document.getElementById("customNote").value.trim() || "無";
+const orderData = {
+cakeColor: cakeColor,
+lettering: lettering,
+customNote: customNote,
+size: document.getElementById("size").value,
+flavor: document.getElementById("flavor").value,
+addons: addonsText,
+date: document.getElementById("date").value,
+time: document.getElementById("time").value,
+location: "台南市中西區友愛街93號",
+lineName: document.getElementById("lineName").value.trim(),
+name: document.getElementById("name").value.trim(),
+phone: cleanPhone
+};
+const message =
+`【蛋糕訂購資訊】
+蛋糕體顏色：${orderData.cakeColor}
+英文題字：${orderData.lettering}
+其他客製需求：${orderData.customNote}
+蛋糕尺寸：${orderData.size}
+蛋糕口味：${orderData.flavor}
+需加購：${orderData.addons}
+取貨日期：${orderData.date}
+取貨時間：${orderData.time}
+自取地點：${orderData.location}
+訂購人 LINE 名稱：${orderData.lineName}
+訂購人姓名：${orderData.name}
+訂購人電話：${orderData.phone}
+圖片提醒：已確認送出後傳送參考圖片報價`;
+const encodedId = encodeURIComponent(LINE_OA_ID);
+const encodedMsg = encodeURIComponent(message);
+const lineUrl = `https://line.me/R/oaMessage/${encodedId}/?${encodedMsg}`;
+// 顯示覆蓋畫面並提醒按發送
+document.getElementById("cakeOrderForm").classList.add("hidden");
+const overlay = document.getElementById("successOverlay");
+overlay.classList.remove("hidden");
+document.getElementById("lineManualBtn").href = lineUrl;
+// 跳轉 LINE
+const jumpLink = document.createElement("a");
+jumpLink.href = lineUrl;
+jumpLink.target = "_blank";
+jumpLink.rel = "noopener noreferrer";
+document.body.appendChild(jumpLink);
+jumpLink.click();
+jumpLink.remove();
+});
+</script>
+</body>
+</html>
