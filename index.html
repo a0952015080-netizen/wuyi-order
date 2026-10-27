@@ -42,7 +42,10 @@ font-size: 16px !important;
 2. 傳送後，請記得隨手<strong>上傳蛋糕參考圖片</strong>方便我們報價。
 </p>
 </div>
-<div class="pt-1">
+<div class="pt-1 space-y-2">
+<button type="button" id="copyOrderBtn" class="w-full bg-stone-100 hover:bg-stone-200 active:scale-[0.99] text-stone-700 font-bold py-2.5 rounded-xl border border-stone-300 transition duration-200 text-xs flex items-center justify-center gap-1.5 shadow-sm">
+<span>📋</span> <span id="copyOrderBtnText">點此手動複製訂購內容</span>
+</button>
 <a id="lineManualBtn" href="https://a0952015080-netizen.github.io/wuyi-order/#" target="_blank" rel="noopener noreferrer" class="inline-block w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-3.5 rounded-xl shadow transition duration-200 text-sm">
 👉 若未自動跳轉，請點此開啟 LINE
 </a>
@@ -113,7 +116,7 @@ font-size: 16px !important;
 <!-- 提前預訂防呆與地點 -->
 <div id="bookingRulesInfo" class="p-2 bg-amber-50 rounded-lg border border-amber-200 text-[11px] text-amber-800 space-y-0.5">
 <div>⏳ <strong>預訂須知：</strong>手作新鮮蛋糕<span id="ruleDaysText"><strong>需提前一週預約</strong></span><br>（每日 18:00 截單；週一固定公休）。</div>
-<div>📍 <strong>自取地點：</strong>台南市中西區友愛街93號</div>
+<div>📍 <strong>自取地點：</strong>台南市中西區友愛街９３號</div>
 </div>
 <!-- 4. 訂購人資訊（加強手機格式防呆） -->
 <div class="space-y-2 pt-1 border-t border-stone-100">
@@ -883,7 +886,7 @@ flavor: document.getElementById("flavor").value,
 addons: addonsText,
 date: document.getElementById("date").value,
 time: document.getElementById("time").value,
-location: "台南市中西區友愛街93號",
+location: "台南市中西區友愛街９３號",
 lineName: document.getElementById("lineName").value.trim(),
 name: document.getElementById("name").value.trim(),
 phone: cleanPhone
@@ -893,16 +896,44 @@ const message =
 蛋糕體顏色：${orderData.cakeColor}
 英文題字：${orderData.lettering}
 其他客製需求：${orderData.customNote}
+
 蛋糕尺寸：${orderData.size}
 蛋糕口味：${orderData.flavor}
+
 需加購：${orderData.addons}
+
+
 取貨日期：${orderData.date}
 取貨時間：${orderData.time}
 自取地點：${orderData.location}
+
 訂購人 LINE 名稱：${orderData.lineName}
 訂購人姓名：${orderData.name}
 訂購人電話：${orderData.phone}
+
 圖片提醒：已確認送出後傳送參考圖片報價`;
+
+// 自動複製到剪貼簿備用
+if (navigator.clipboard && navigator.clipboard.writeText) {
+navigator.clipboard.writeText(message).catch(() => {});
+}
+
+// 支援覆蓋畫面的複製按鈕
+const copyBtn = document.getElementById("copyOrderBtn");
+const copyBtnText = document.getElementById("copyOrderBtnText");
+if (copyBtn) {
+copyBtn.onclick = function() {
+if (navigator.clipboard && navigator.clipboard.writeText) {
+navigator.clipboard.writeText(message).then(() => {
+copyBtnText.innerText = "已成功複製訂購文字！";
+setTimeout(() => { copyBtnText.innerText = "點此手動複製訂購內容"; }, 2000);
+}).catch(() => {
+alert("複製失敗，請手動選取文字");
+});
+}
+};
+}
+
 const encodedId = encodeURIComponent(LINE_OA_ID);
 const encodedMsg = encodeURIComponent(message);
 const lineUrl = `https://line.me/R/oaMessage/${encodedId}/?${encodedMsg}`;
