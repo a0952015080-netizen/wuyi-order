@@ -266,6 +266,13 @@ font-size: 16px !important;
 </button>
 </div>
 <p id="adminSyncStatus" class="text-[10px] text-center text-stone-500 hidden"></p>
+<details class="text-[11px] text-stone-500 pt-1">
+<summary class="cursor-pointer text-stone-400 hover:text-stone-600 select-none">🔑 設定 / 更換 GitHub Token</summary>
+<div class="mt-1 space-y-1 bg-stone-50 p-2 rounded-lg border border-stone-200">
+<input type="text" id="adminTokenInput" placeholder="ghp_..." class="w-full border border-stone-300 rounded p-1.5 text-xs font-mono bg-white outline-none" />
+<p class="text-[10px] text-amber-700">⚠️ Token 必須勾選 <strong>repo</strong> 權限才能成功上傳至 GitHub。</p>
+</div>
+</details>
 </div>
 </div>
 </div>
@@ -277,7 +284,7 @@ const LINE_OA_ID = "@230fpemy";
 // ☁️ GitHub 雲端同步設定（店長儲存自動同步，客人打開即時更新）
 // ============================================
 const GITHUB_REPO = "a0952015080-netizen/wuyi-order";
-const GITHUB_TOKEN = "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";
+const GITHUB_TOKEN = "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";
 const SETTINGS_FILE = "calendar_settings.json";
 
 // 預設公休與預約規則（預設開放一個月、提前一週預約、週一固定公休）
@@ -294,6 +301,11 @@ try {
 const savedMon = localStorage.getItem("wuyi_cake_disable_monday_v1");
 if (savedMon !== null) {
 disableMondaySetting = JSON.parse(savedMon);
+}
+// 清除舊無效 token 快取
+const oldTok = localStorage.getItem("wuyi_github_token");
+if (oldTok && oldTok.startsWith("ghp_Luc7")) {
+localStorage.removeItem("wuyi_github_token");
 }
 } catch(e) {}
 
@@ -667,6 +679,10 @@ viewYear = todayObj.getFullYear();
 viewMonth = todayObj.getMonth();
 setBrush('open');
 renderAdminCalendar();
+const adminTokenInput = document.getElementById("adminTokenInput");
+if (adminTokenInput) {
+adminTokenInput.value = localStorage.getItem("wuyi_github_token") || GITHUB_TOKEN;
+}
 } else {
 adminPwdError.classList.remove("hidden");
 adminPwdInput.focus();
@@ -683,6 +699,7 @@ verifyPassword();
 
 // ☁️ 儲存並同步至 GitHub API（讓所有客人手機立即生效）
 async function syncToGitHubAPI(statusObj, disableMon) {
+const activeToken = (localStorage.getItem("wuyi_github_token") || GITHUB_TOKEN).trim();
 const payload = {
 updatedAt: new Date().toISOString(),
 disableMonday: disableMon,
@@ -696,7 +713,7 @@ let sha = null;
 try {
 const checkRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${SETTINGS_FILE}`, {
 headers: {
-"Authorization": `token ${GITHUB_TOKEN}`,
+"Authorization": `Bearer ${activeToken}`,
 "Accept": "application/vnd.github.v3+json"
 }
 });
@@ -716,7 +733,7 @@ if (sha) body.sha = sha;
 const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${SETTINGS_FILE}`, {
 method: "PUT",
 headers: {
-"Authorization": `token ${GITHUB_TOKEN}`,
+"Authorization": `Bearer ${activeToken}`,
 "Accept": "application/vnd.github.v3+json",
 "Content-Type": "application/json"
 },
@@ -725,13 +742,24 @@ body: JSON.stringify(body)
 
 if (!putRes.ok) {
 const errData = await putRes.json().catch(() => ({}));
-throw new Error(errData.message || "GitHub API 回傳錯誤");
+const status = putRes.status;
+let detailMsg = errData.message || "未知原因";
+if (status === 401) {
+detailMsg = "Token 已過期或無效 (401 Bad credentials)";
+} else if (status === 403 || status === 404) {
+detailMsg = `權限不足 (${status})：Token 必須勾選「repo」權限才能寫入！`;
+}
+throw new Error(detailMsg);
 }
 return await putRes.json();
 }
 
 // 儲存並同步全站
 adminSaveSettingsBtn.addEventListener("click", async function() {
+const adminTokenInput = document.getElementById("adminTokenInput");
+if (adminTokenInput && adminTokenInput.value.trim()) {
+localStorage.setItem("wuyi_github_token", adminTokenInput.value.trim());
+}
 const originalBtnText = adminSaveSettingsBtn.innerHTML;
 adminSaveSettingsBtn.disabled = true;
 adminSaveSettingsBtn.innerHTML = `<span>⏳ 正在同步至 GitHub 雲端...</span>`;
