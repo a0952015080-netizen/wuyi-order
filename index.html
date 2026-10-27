@@ -188,10 +188,13 @@ font-size: 16px !important;
 <div id="adminStepPanel" class="hidden space-y-3">
 <div class="flex items-center justify-between border-b pb-2">
 <div>
+<div class="flex items-center gap-2">
 <h3 class="text-sm font-bold text-stone-800 flex items-center gap-1">
 <span>👑</span> 店長模式：日期開放管理
 </h3>
-<p class="text-[11px] text-stone-500">預設開放一個月，可自由點擊日期設定可訂或公休</p>
+<span id="cloudSyncStatus" class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-medium">☁️ Google 試算表已連線</span>
+</div>
+<p class="text-[11px] text-stone-500">預設開放一個月，點選後按儲存將自動同步至雲端試算表</p>
 </div>
 <button type="button" id="adminClosePanelBtn" class="text-stone-400 hover:text-stone-600 text-lg leading-none">&times;</button>
 </div>
@@ -260,13 +263,18 @@ font-size: 16px !important;
 <!-- 儲存與恢復按鈕 -->
 <div class="grid grid-cols-2 gap-2 pt-2 border-t border-stone-100">
 <button type="button" id="adminResetDefaultBtn" class="w-full py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-semibold">恢復原廠預設</button>
-<button type="button" id="adminSaveSettingsBtn" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md">儲存並套用日曆</button>
+<button type="button" id="adminSaveSettingsBtn" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white rounded-xl text-xs font-bold shadow-md transition flex items-center justify-center gap-1">
+<span>☁️ 儲存並套用日曆</span>
+</button>
 </div>
 </div>
 </div>
 </div>
 <script>
 const LINE_OA_ID = "@230fpemy";
+// Google 試算表（Google Apps Script 雲端同步網址）
+const GAS_CALENDAR_API = "https://script.google.com/macros/s/AKfycbzVxDkFO8UDZHUZYhiwGSFsTU4v6Ilbp0mgLXHEiXtDYYv_9p3epdF_y1IoWwSalqVx/exec";
+
 // 預設公休與預約規則（預設開放一個月、提前一週預約、週一固定公休）
 const DEFAULT_CLOSED_DATES = ["2026-10-27", "2026-11-24", "2026-12-01"];
 let defaultPreorderDays = 7;
@@ -274,6 +282,14 @@ const currentHour = new Date().getHours();
 if (currentHour >= 18) {
 defaultPreorderDays += 1; // 超過傍晚 18:00 截單，需多加 1 天備料
 }
+
+// 狀態標準化工具（支援字串 'open'/'closed' 與布林值 true/false）
+function normalizeStatus(val) {
+if (val === true || val === 'open') return 'open';
+if (val === false || val === 'closed') return 'closed';
+return val;
+}
+
 // 阻擋週一固定公休開關狀態（預設開啟阻擋）
 let disableMondaySetting = true;
 try {
@@ -282,14 +298,19 @@ if (savedMon !== null) {
 disableMondaySetting = JSON.parse(savedMon);
 }
 } catch(e) {}
+
 // 儲存店長自訂的日期狀態 (key: "YYYY-MM-DD", value: "open" | "closed")
 let calendarDateStatus = {};
 try {
 const saved = localStorage.getItem("wuyi_cake_date_status_v1");
 if (saved) {
-calendarDateStatus = JSON.parse(saved);
+const parsed = JSON.parse(saved);
+for (const k in parsed) {
+calendarDateStatus[k] = normalizeStatus(parsed[k]);
+}
 }
 } catch(e) {}
+
 const standardFlavors = [
 "A 原味戚風＋藍莓果醬&藍莓＋豆乳奶凍＋原味奶油",
 "B 可可戚風＋當季水果＋Oreo巧克力脆＋Oreo鹹奶油",
@@ -312,6 +333,7 @@ const candleField = document.getElementById("candleField");
 const candleDetail = document.getElementById("candleDetail");
 const noAddonsCheckbox = document.getElementById("noAddonsCheckbox");
 const otherAddons = document.querySelectorAll('input[name="addons"]:not(#noAddonsCheckbox)');
+
 // 加購項目互斥防呆
 noAddonsCheckbox.addEventListener("change", function() {
 if (this.checked) {
@@ -327,6 +349,7 @@ noAddonsCheckbox.checked = false;
 }
 });
 });
+
 // 數字蠟燭展開
 candleCheckbox.addEventListener("change", function() {
 if (this.checked) {
@@ -337,8 +360,10 @@ candleField.classList.add("hidden");
 candleDetail.value = "";
 }
 });
+
 // 格式化 YYYY-MM-DD
 const formatYMD = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
 // 取得日期的預設開放狀態（若店長未手動點選覆蓋）
 function getDefaultStatus(dStr) {
 const parts = dStr.split('-');
@@ -361,6 +386,16 @@ if (disableMondaySetting && d.getDay() === 1) return 'closed';
 if (DEFAULT_CLOSED_DATES.includes(dStr)) return 'closed';
 return 'open';
 }
+
+// 綜合判斷日期狀態
+function getDateStatus(dStr) {
+if (calendarDateStatus[dStr] !== undefined) {
+const s = normalizeStatus(calendarDateStatus[dStr]);
+if (s === 'open' || s === 'closed') return s;
+}
+return getDefaultStatus(dStr);
+}
+
 // 初始化與重建客人預訂日曆
 let fpInstance = null;
 function initCalendar() {
@@ -370,7 +405,7 @@ now.setHours(0,0,0,0);
 let maxBookingDate = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
 // 若店長在一個月外有額外設定「可預訂」，自動延伸上限至該日期
 for (const dStr in calendarDateStatus) {
-if (calendarDateStatus[dStr] === 'open') {
+if (normalizeStatus(calendarDateStatus[dStr]) === 'open') {
 const parts = dStr.split('-');
 const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
 if (d > maxBookingDate) maxBookingDate = d;
@@ -391,14 +426,16 @@ dateFormat: "Y-m-d",
 disable: [
 function(date) {
 const dStr = formatYMD(date);
-const status = calendarDateStatus[dStr] !== undefined ? calendarDateStatus[dStr] : getDefaultStatus(dStr);
+const status = getDateStatus(dStr);
 return status !== 'open'; // 只要不是 open 一律禁止點選
 }
 ]
 });
 }
-// 初次啟動日曆
+
+// 初次啟動日曆（先吃本機快取）
 initCalendar();
+
 // 尺寸連動口味
 sizeSelect.addEventListener("change", function() {
 const val = this.value;
@@ -426,6 +463,7 @@ flavorHint.classList.add("hidden");
 flavorSelect.innerHTML = '<option value="">先選尺寸</option>';
 }
 });
+
 // ============================================
 // 🎂 蛋糕圖案點擊 -> 密碼驗證 5151 -> 👑 店長模式
 // ============================================
@@ -451,12 +489,15 @@ const adminQuickAllOpenBtn = document.getElementById("adminQuickAllOpenBtn");
 const adminQuickMonCloseBtn = document.getElementById("adminQuickMonCloseBtn");
 const adminSaveSettingsBtn = document.getElementById("adminSaveSettingsBtn");
 const adminResetDefaultBtn = document.getElementById("adminResetDefaultBtn");
+const cloudSyncStatus = document.getElementById("cloudSyncStatus");
+
 // 當前筆刷動作：'open'（可以預訂） 或 'closed'（不可預訂）
 let currentBrush = 'open';
 // 瀏覽的年月
 const todayObj = new Date();
 let viewYear = todayObj.getFullYear();
 let viewMonth = todayObj.getMonth();
+
 // 切換筆刷狀態樣式
 function setBrush(mode) {
 currentBrush = mode;
@@ -470,11 +511,13 @@ brushOpenBtn.className = "py-2 px-2 rounded-xl border-2 text-xs font-bold flex i
 }
 brushOpenBtn.addEventListener("click", () => setBrush('open'));
 brushClosedBtn.addEventListener("click", () => setBrush('closed'));
+
 // 🚫 週一公休開關切換
 settingDisableMonday.addEventListener("change", function() {
 disableMondaySetting = this.checked;
 renderAdminCalendar();
 });
+
 // ⚡ 一鍵急件解鎖：立刻解除提前一週、週一公休與公休限制
 quickUnlockAllBtn.addEventListener("click", function() {
 disableMondaySetting = false;
@@ -488,8 +531,9 @@ const dStr = formatYMD(d);
 calendarDateStatus[dStr] = 'open';
 }
 renderAdminCalendar();
-alert("🎉 已一鍵解鎖！今天起到未來一個月的所有日期皆可預訂（包含今天、明天、週一與公休日）。\n請點擊下方「儲存並套用日曆」即可生效！");
+alert("🎉 已一鍵解鎖！今天起到未來一個月的所有日期皆可預訂（包含今天、明天、週一與公休日）。\n請點擊下方「儲存並套用日曆」同步至 Google 試算表！");
 });
+
 // 渲染店長日曆表格（用按的）
 function renderAdminCalendar() {
 calendarMonthTitle.innerText = `${viewYear} 年 ${viewMonth + 1} 月`;
@@ -516,7 +560,7 @@ if (isPast) {
 cell.className += " bg-stone-100 text-stone-300 cursor-not-allowed border border-transparent";
 cell.innerHTML = `<span class="text-xs">${day}</span><span class="text-[9px] leading-none">-</span>`;
 } else {
-const status = calendarDateStatus[dStr] !== undefined ? calendarDateStatus[dStr] : getDefaultStatus(dStr);
+const status = getDateStatus(dStr);
 cell.dataset.date = dStr;
 if (status === 'open') {
 cell.className += " bg-emerald-50 text-emerald-800 border-2 border-emerald-400 font-bold hover:brightness-95 cursor-pointer shadow-xs";
@@ -527,7 +571,7 @@ cell.innerHTML = `<span class="text-xs leading-tight">${day}</span><span class="
 }
 // 點擊事件：直接用按的切換狀態！
 cell.addEventListener("click", function() {
-const currentStatus = calendarDateStatus[dStr] !== undefined ? calendarDateStatus[dStr] : getDefaultStatus(dStr);
+const currentStatus = getDateStatus(dStr);
 if (currentStatus !== currentBrush) {
 calendarDateStatus[dStr] = currentBrush;
 } else {
@@ -539,6 +583,7 @@ renderAdminCalendar();
 calendarGrid.appendChild(cell);
 }
 }
+
 // 月份切換按鈕
 prevMonthBtn.addEventListener("click", function() {
 viewMonth--;
@@ -556,6 +601,7 @@ viewYear++;
 }
 renderAdminCalendar();
 });
+
 // 快捷操作：本月全開
 adminQuickAllOpenBtn.addEventListener("click", function() {
 const totalDays = new Date(viewYear, viewMonth + 1, 0).getDate();
@@ -571,6 +617,7 @@ calendarDateStatus[dStr] = 'open';
 }
 renderAdminCalendar();
 });
+
 // 快捷操作：週一全休
 adminQuickMonCloseBtn.addEventListener("click", function() {
 const totalDays = new Date(viewYear, viewMonth + 1, 0).getDate();
@@ -586,12 +633,14 @@ calendarDateStatus[dStr] = 'closed';
 }
 renderAdminCalendar();
 });
+
 // 全形轉半形
 function toHalfWidth(str) {
 return (str || "").replace(/[０-９]/g, function(c) {
 return String.fromCharCode(c.charCodeAt(0) - 0xfee0);
 }).trim();
 }
+
 // 點擊蛋糕圖案開啟彈窗
 adminCakeBtn.addEventListener("click", function() {
 adminModal.classList.remove("hidden");
@@ -601,6 +650,7 @@ adminPwdError.classList.add("hidden");
 adminPwdInput.value = "";
 setTimeout(() => adminPwdInput.focus(), 100);
 });
+
 // 關閉彈窗
 function closeAdminModal() {
 adminModal.classList.add("hidden");
@@ -610,6 +660,7 @@ adminPwdError.classList.add("hidden");
 adminCancelAuthBtn.addEventListener("click", closeAdminModal);
 adminCloseAuthBtn.addEventListener("click", closeAdminModal);
 adminClosePanelBtn.addEventListener("click", closeAdminModal);
+
 // 驗證密碼 5151
 function verifyPassword() {
 const pwd = toHalfWidth(adminPwdInput.value);
@@ -634,34 +685,158 @@ e.preventDefault();
 verifyPassword();
 }
 });
-// 儲存並套用日曆
-adminSaveSettingsBtn.addEventListener("click", function() {
+
+// ============================================
+// ☁️ Google 試算表 (Google Apps Script) 雲端連線與同步
+// ============================================
+// 從 Google 試算表載入最新日曆開放狀態
+async function loadCalendarFromGAS() {
 try {
+if (cloudSyncStatus) {
+cloudSyncStatus.innerHTML = '<span class="animate-spin inline-block mr-1">🔄</span>同步中...';
+cloudSyncStatus.className = "text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-medium flex items-center";
+}
+const res = await fetch(GAS_CALENDAR_API + "?t=" + Date.now(), { method: "GET" });
+if (!res.ok) throw new Error("HTTP " + res.status);
+const json = await res.json();
+if (json && (json.status === "success" || json.data)) {
+const data = json.data || json;
+if (typeof data.disableMonday === "boolean") {
+disableMondaySetting = data.disableMonday;
+if (settingDisableMonday) settingDisableMonday.checked = disableMondaySetting;
+localStorage.setItem("wuyi_cake_disable_monday_v1", JSON.stringify(disableMondaySetting));
+}
+if (data.calendarDateStatus && typeof data.calendarDateStatus === "object") {
+for (const k in data.calendarDateStatus) {
+calendarDateStatus[k] = normalizeStatus(data.calendarDateStatus[k]);
+}
+}
+if (Array.isArray(data.closedDates)) {
+data.closedDates.forEach(d => {
+if (!calendarDateStatus[d]) calendarDateStatus[d] = 'closed';
+});
+}
+if (Array.isArray(data.specialOpenDates)) {
+data.specialOpenDates.forEach(d => {
+if (!calendarDateStatus[d]) calendarDateStatus[d] = 'open';
+});
+}
 localStorage.setItem("wuyi_cake_date_status_v1", JSON.stringify(calendarDateStatus));
+initCalendar();
+if (!adminModal.classList.contains("hidden") && !adminStepPanel.classList.contains("hidden")) {
+renderAdminCalendar();
+}
+if (cloudSyncStatus) {
+cloudSyncStatus.innerHTML = '☁️ Google 試算表已連線';
+cloudSyncStatus.className = "text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-medium flex items-center";
+}
+}
+} catch (err) {
+console.warn("無法取得 Google 試算表日曆資料，使用本機快取:", err);
+if (cloudSyncStatus) {
+cloudSyncStatus.innerHTML = '☁️ 使用本機快取 (離線)';
+cloudSyncStatus.className = "text-[10px] bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full font-medium flex items-center";
+}
+}
+}
+
+// 儲存並套用日曆（捨棄 TOKEN，改用 Google 試算表同步）
+adminSaveSettingsBtn.addEventListener("click", async function() {
+const btn = adminSaveSettingsBtn;
+const originalHtml = btn.innerHTML;
+btn.disabled = true;
+btn.innerHTML = '<span>☁️ 雲端同步儲存中...</span>';
+
+// 整理並正規化日期狀態
+const cleanStatus = {};
+for (const k in calendarDateStatus) {
+cleanStatus[k] = normalizeStatus(calendarDateStatus[k]);
+}
+
+const payload = {
+updatedAt: new Date().toISOString(),
+disableMonday: disableMondaySetting,
+calendarDateStatus: cleanStatus
+};
+
+// 本機先快取
+try {
+localStorage.setItem("wuyi_cake_date_status_v1", JSON.stringify(cleanStatus));
 localStorage.setItem("wuyi_cake_disable_monday_v1", JSON.stringify(disableMondaySetting));
 } catch(e) {}
+
+try {
+const res = await fetch(GAS_CALENDAR_API, {
+method: "POST",
+headers: { "Content-Type": "text/plain;charset=utf-8" },
+body: JSON.stringify(payload)
+});
 initCalendar();
 closeAdminModal();
 setTimeout(() => {
-alert("✅ 日期開放設定已儲存！客人預訂時只能點選您標記為【可訂】的日期。");
-fpInstance.open();
+alert("✅ 日期開放設定已成功儲存並同步至 Google 雲端試算表！\n客人現在即可預訂您最新開放的日期。");
+if (fpInstance) fpInstance.open();
 }, 150);
+} catch (err) {
+console.error("同步至 Google 試算表失敗:", err);
+initCalendar();
+closeAdminModal();
+setTimeout(() => {
+alert("⚠️ 日期已先儲存於本機！\n（雲端同步可能有短暫網路延遲，請稍後確認網路連線）");
+if (fpInstance) fpInstance.open();
+}, 150);
+} finally {
+btn.disabled = false;
+btn.innerHTML = originalHtml;
+}
 });
-// 恢復原廠預設值（預設開放一個月、提前一週預約、週一固定公休）
-function resetToDefault() {
+
+// 恢復原廠預設值
+adminResetDefaultBtn.addEventListener("click", async function() {
+if (!confirm("確定要將所有日期設定恢復為原廠預設值嗎？\n（預設開放一個月、需提前一週預約、週一固定公休）")) {
+return;
+}
+const btn = adminResetDefaultBtn;
+const originalText = btn.innerText;
+btn.disabled = true;
+btn.innerText = "重設中...";
+
 calendarDateStatus = {};
 disableMondaySetting = true;
 settingDisableMonday.checked = true;
+
 try {
 localStorage.removeItem("wuyi_cake_date_status_v1");
 localStorage.removeItem("wuyi_cake_disable_monday_v1");
 } catch(e) {}
+
+const payload = {
+updatedAt: new Date().toISOString(),
+disableMonday: true,
+calendarDateStatus: {}
+};
+
+try {
+await fetch(GAS_CALENDAR_API, {
+method: "POST",
+headers: { "Content-Type": "text/plain;charset=utf-8" },
+body: JSON.stringify(payload)
+});
+} catch(e) {
+console.warn("重設雲端失敗:", e);
+} finally {
+btn.disabled = false;
+btn.innerText = originalText;
 initCalendar();
 renderAdminCalendar();
 closeAdminModal();
-alert("🔄 已成功恢復為預設規則（預設開放一個月、需提前一週預約、週一固定公休）！");
+alert("🔄 已成功恢復為預設規則，並同步重設至 Google 雲端試算表！");
 }
-adminResetDefaultBtn.addEventListener("click", resetToDefault);
+});
+
+// 頁面載入後，非同步自動自 Google 試算表拉取最新日期設定
+loadCalendarFromGAS();
+
 // ============================================
 // 表單送出前「全面嚴格驗證」
 // ============================================
