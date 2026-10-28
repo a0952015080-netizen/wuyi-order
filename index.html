@@ -1,1613 +1,1007 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <base target="_blank">
-  <title>現貨漢堡盒 當日預留表單</title>
-  <meta name="description" content="現貨漢堡盒 當日預留表單">
-
-  <!-- LINE / 社群分享預覽卡片 (Open Graph) 設定 -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="現貨漢堡盒 當日預留表單">
-  <meta property="og:description" content="現貨漢堡盒 當日預留表單">
-  <meta property="og:site_name" content="現貨漢堡盒 當日預留表單">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="現貨漢堡盒 當日預留表單">
-  <meta name="twitter:description" content="現貨漢堡盒 當日預留表單">
-
-  <script>
-    (function() {
-      // 攔截頁內錨點滑動，防止在 Google 協作平台 iframe 中跳新分頁
-      document.addEventListener('click', function(e) {
-        var el = e.target;
-        var anchor = null;
-        while (el && el !== document) {
-          if (el.tagName && el.tagName.toLowerCase() === 'a') {
-            anchor = el;
-            break;
-          }
-          el = el.parentElement;
-        }
-        if (!anchor) return;
-
-        var href = anchor.getAttribute('href');
-        if (!href) return;
-        href = href.trim();
-        if (!href.startsWith('#')) return;
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (href === '#' || href === '#top') {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          return;
-        }
-
-        var targetId = href.slice(1);
-        try { targetId = decodeURIComponent(targetId); } catch (err) {}
-        var targetEl = document.getElementById(targetId);
-        if (targetEl) {
-          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, true);
-    })();
-  </script>
-
-  <style>
-    :root {
-      --pink: #d69b8c;
-      --pink-light: #f8e9e3;
-      --cream: #fffaf6;
-      --brown: #60483d;
-      --border: #eadbd3;
-    }
-    * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: var(--cream);
-      color: var(--brown);
-      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-      line-height: 1.4;
-      -webkit-text-size-adjust: 100%;
-    }
-    body {
-      padding: 8px;
-    }
-    button, input, select, textarea {
-      font: inherit;
-    }
-    .container {
-      width: 100%;
-      max-width: 520px;
-      margin: 0 auto;
-    }
-
-    /* 頂部標題 */
-    .hero {
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #f8e1d8, #fff4ec);
-      margin-bottom: 6px;
-    }
-    .hero-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-    }
-    .hero-row + .hero-row {
-      margin-top: 3px;
-    }
-    .hero .emoji {
-      font-size: 20px;
-      line-height: 1;
-      user-select: none;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: transform 0.15s ease;
-      -webkit-tap-highlight-color: transparent;
-      padding: 2px 4px;
-    }
-    .hero .emoji:hover {
-      transform: scale(1.15);
-    }
-    .hero .emoji:active {
-      transform: scale(0.92);
-    }
-    .hero-text {
-      width: 100%;
-      min-width: 0;
-    }
-    .hero-text h1 {
-      font-size: 17px;
-      margin: 0;
-    }
-    .hero-text p {
-      margin: 0;
-      font-size: 12px;
-      color: #7a6054;
-    }
-    .date-badge {
-      display: inline-block;
-      background: var(--pink);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 1px 7px;
-      border-radius: 99px;
-      margin-left: 4px;
-      vertical-align: middle;
-    }
-
-    /* 雲端同步狀態標籤 */
-    .cloud-status-badge {
-      display: inline-flex;
-      align-items: center;
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 99px;
-      background: #f0fdf4;
-      color: #166534;
-      border: 1px solid #bbf7d0;
-      font-weight: 600;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .cloud-status-badge.syncing {
-      background: #fefce8;
-      color: #854d0e;
-      border-color: #fef08a;
-    }
-    .cloud-status-badge.offline {
-      background: #f5f5f4;
-      color: #57534e;
-      border-color: #e7e5e4;
-    }
-
-    /* 精簡整理的訂購須知 */
-    .notice {
-      background: #fff;
-      border: 1px solid var(--border);
-      padding: 9px 12px;
-      border-radius: 10px;
-      margin-bottom: 6px;
-      font-size: 12.5px;
-      line-height: 1.55;
-    }
-    .notice-list {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-    .bank-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-      background: #fdf6f2;
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 5px 8px;
-      margin-top: 5px;
-    }
-    .copy-acct-btn {
-      padding: 3px 9px;
-      border: 1px solid var(--pink);
-      border-radius: 6px;
-      background: #fff;
-      color: #a65e51;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .copy-acct-btn:active {
-      background: var(--pink);
-      color: #fff;
-    }
-
-    /* 密碼驗證彈窗 */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(2px);
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .modal-overlay[hidden] {
-      display: none !important;
-    }
-    .pwd-card {
-      background: #fff;
-      border: 2px solid var(--pink);
-      border-radius: 14px;
-      width: 100%;
-      max-width: 310px;
-      padding: 18px 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-      text-align: center;
-      animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    @keyframes modalPop {
-      0% { transform: scale(0.92); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .pwd-icon {
-      font-size: 28px;
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-    .pwd-title {
-      font-size: 15.5px;
-      font-weight: 700;
-      color: var(--brown);
-      margin-bottom: 12px;
-    }
-    .pwd-input {
-      width: 100%;
-      padding: 8px 10px;
-      font-size: 16px;
-      text-align: center;
-      letter-spacing: 3px;
-      border: 1.5px solid #d9d9d9;
-      border-radius: 8px;
-      margin-bottom: 6px;
-      outline: none;
-      background: #fdfaf8;
-    }
-    .pwd-input:focus {
-      border-color: var(--pink);
-      background: #fff;
-      box-shadow: 0 0 0 2px rgba(214,155,140,0.25);
-    }
-    .pwd-error {
-      font-size: 11.5px;
-      color: #c64b42;
-      font-weight: 600;
-      margin-bottom: 8px;
-      min-height: 16px;
-    }
-    .pwd-actions {
-      display: flex;
-      gap: 8px;
-    }
-    .pwd-btn {
-      flex: 1;
-      padding: 8px 10px;
-      border-radius: 7px;
-      font-size: 13.5px;
-      font-weight: 700;
-      cursor: pointer;
-      border: 1px solid var(--border);
-    }
-    .pwd-btn.cancel {
-      background: #f8f8f8;
-      color: #666;
-    }
-    .pwd-btn.confirm {
-      background: var(--pink);
-      color: #fff;
-      border-color: var(--pink);
-    }
-
-    /* 過期鎖定提示框 */
-    .expired-card {
-      background: #fff;
-      border: 2px solid var(--pink);
-      border-radius: 12px;
-      padding: 24px 16px;
-      text-align: center;
-      margin-top: 10px;
-    }
-    .expired-card h2 {
-      font-size: 18px;
-      margin: 0 0 8px;
-      color: #a65e51;
-    }
-    .expired-card p {
-      font-size: 14px;
-      margin: 6px 0;
-      color: var(--brown);
-      line-height: 1.6;
-    }
-    .expired-btn {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 10px 20px;
-      background: var(--pink);
-      color: #fff;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    /* 店家設定面板 */
-    .admin-panel {
-      background: #fff8f0;
-      border: 2px dashed var(--pink);
-      border-radius: 12px;
-      padding: 12px;
-      margin-top: 10px;
-      margin-bottom: 8px;
-    }
-    .admin-title {
-      font-weight: 700;
-      font-size: 15px;
-      margin-bottom: 4px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .admin-subtitle {
-      font-size: 12px;
-      font-weight: 700;
-      color: #8b7469;
-      margin: 8px 0 4px;
-    }
-    .style-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 5px;
-    }
-    .style-grid.grid-2 { grid-template-columns: repeat(2, 1fr); }
-    .num-row {
-      display: grid;
-      grid-template-columns: 46px repeat(4, 1fr);
-      gap: 4px;
-      margin-bottom: 4px;
-    }
-    .row-toggle-btn {
-      padding: 5px 2px;
-      border: 1px dashed var(--pink);
-      border-radius: 6px;
-      background: #fff3ee;
-      color: #a65e51;
-      font-size: 11.5px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .style-btn {
-      padding: 6px 2px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: #fff;
-      color: var(--brown);
-      font-size: 12.5px;
-      font-weight: 700;
-      cursor: pointer;
-      text-align: center;
-    }
-    .style-btn.active {
-      background: var(--pink);
-      color: #fff;
-      border-color: var(--pink);
-    }
-    .custom-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 5px;
-    }
-    .custom-grid input {
-      padding: 6px 8px !important;
-      font-size: 12.5px !important;
-      height: 32px !important;
-    }
-    .admin-quick {
-      display: flex;
-      gap: 5px;
-      margin-top: 8px;
-      flex-wrap: wrap;
-    }
-    .admin-quick button {
-      flex: 1;
-      min-width: 70px;
-      padding: 6px 4px;
-      font-size: 12px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      background: #fff;
-      color: var(--brown);
-      cursor: pointer;
-    }
-    .admin-lock-opt {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 10px;
-      padding: 7px 9px;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      font-size: 12.5px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .admin-lock-opt input {
-      width: 16px;
-      height: 16px;
-      margin: 0;
-      accent-color: var(--pink);
-    }
-    .admin-actions { margin-top: 8px; }
-    .admin-actions button.primary {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 0;
-      background: #a65e51;
-      color: #fff;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: background 0.2s;
-    }
-    .admin-actions button.primary:hover {
-      background: #914f43;
-    }
-    .admin-actions button.primary:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    .admin-actions button.secondary {
-      width: 100%;
-      margin-top: 6px;
-      padding: 7px;
-      border-radius: 7px;
-      border: 1px solid var(--pink);
-      background: #fff;
-      color: #a65e51;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .copy-box {
-      margin-top: 8px;
-      background: #fff;
-      border: 1px solid var(--pink);
-      border-radius: 8px;
-      padding: 8px;
-    }
-    .copy-status {
-      font-size: 12px;
-      font-weight: 700;
-      color: #b35c4e;
-      margin-bottom: 4px;
-    }
-    .copy-box textarea {
-      width: 100%;
-      height: 60px;
-      font-size: 11px;
-      padding: 6px;
-      border: 1px solid #d9d9d9;
-      border-radius: 6px;
-      background: #fdf8f5;
-      word-break: break-all;
-    }
-
-    /* 主表單卡片 */
-    .card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 12px;
-    }
-    .row-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 7px;
-    }
-    .field-label {
-      display: block;
-      font-size: 12.5px;
-      font-weight: 700;
-      margin-bottom: 2px;
-    }
-    .required { color: #c64b42; }
-
-    input:not([type="radio"]):not([type="checkbox"]),
-    select {
-      display: block;
-      width: 100%;
-      min-width: 0;
-      padding: 6px 9px;
-      font-size: 14.5px;
-      color: var(--brown);
-      background: #fff;
-      border: 1px solid #d9d9d9;
-      border-radius: 7px;
-      height: 35px;
-    }
-    input:focus, select:focus {
-      outline: 2px solid #e8b8aa;
-      border-color: var(--pink);
-    }
-
-    /* 勾選按鈕樣式 */
-    .addon-box {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 8px;
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      background: #fffaf8;
-      user-select: none;
-      height: 35px;
-    }
-    .addon-box input {
-      width: 15px;
-      height: 15px;
-      margin: 0;
-      accent-color: var(--pink);
-      flex-shrink: 0;
-    }
-
-    /* 同意條款與底部結帳區 */
-    .agree-line {
-      display: flex;
-      align-items: flex-start;
-      gap: 6px;
-      font-size: 11.5px;
-      color: #6e564b;
-      margin: 6px 0;
-      cursor: pointer;
-    }
-    .agree-line input {
-      width: 15px;
-      height: 15px;
-      margin-top: 1px;
-      flex-shrink: 0;
-      accent-color: var(--pink);
-    }
-
-    .footer-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--pink-light);
-      border-radius: 9px;
-      padding: 7px 10px;
-      gap: 10px;
-    }
-    .price-summary {
-      line-height: 1.2;
-    }
-    .price-summary .label {
-      font-size: 11px;
-      color: #7a6054;
-    }
-    .price-summary .grand-total {
-      font-size: 19px;
-      font-weight: 800;
-      color: #a65e51;
-    }
-    .submit {
-      flex: 1;
-      max-width: 205px;
-      padding: 9px 10px;
-      border: 0;
-      border-radius: 7px;
-      background: var(--pink);
-      color: #fff;
-      font-size: 14.5px;
-      font-weight: 700;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    [hidden] { display: none !important; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<base target="_blank">
+<title>🎂 WUYI 蛋糕訂購預訂單</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Flatpickr 日曆 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<style>
+/* 防止 iPhone 點擊輸入框自動放大 */
+input, select, textarea {
+font-size: 16px !important;
+}
+.flatpickr-day.selected { background: #d97706 !important; border-color: #d97706 !important; }
+.flatpickr-day.today { border-color: #d97706 !important; }
+</style>
 </head>
-
-<body>
-<div class="container">
-
-<!-- 頂部標題 -->
-<header class="hero">
-  <div class="hero-text">
-    <div class="hero-row">
-      <h1>現貨漢堡盒蛋糕 <span class="date-badge" id="dateBadge">今日限定</span></h1>
-      <span id="cloudSyncStatus" class="cloud-status-badge syncing">🔄 連線中...</span>
-    </div>
-    <div class="hero-row">
-      <p>請先於 LINE 確認款式還有現貨，再填寫預留資料 ♡</p>
-      <div class="emoji" id="secretTrigger">🎂</div>
-    </div>
-  </div>
-</header>
-
-<!-- 過期時顯示的畫面（隔天自動鎖定表單） -->
-<section class="expired-card" id="expiredCard" hidden>
-  <h2>⏰ 此預留表單已過期</h2>
-  <p>這份表單是 <strong id="expiredDateText">今日</strong> 的現貨預留單，目前已截止囉！</p>
-  <p>每日現貨款式不同，請先至官方 LINE 確認今日款式還有沒有現貨，我們會再傳送今日連結給您填寫 ♡</p>
-  <a class="expired-btn" href="https://line.me/R/oaMessage/%40230fpemy/?" target="_blank" rel="noopener">
-    前往官方 LINE 詢問今日現貨 ➔
-  </a>
-</section>
-
-<!-- 主內容區（未過期才顯示） -->
-<div id="activeContent">
-  <!-- 精簡版訂購須知 -->
-  <section class="notice">
-    <ul class="notice-list">
-      <li>📢 <strong>價格</strong>：現貨漢堡盒 <strong>$700</strong></li>
-      <li>🕒 <strong>取貨</strong>：當日 15:00～19:00（台南市中西區友愛街 93 號）</li>
-      <li>⚠️ <strong>規則</strong>：詢問保留 15 分鐘，須由店家確認款式及收款後才算預留成功</li>
-    </ul>
-    <div class="bank-row">
-      <span>🏦 連線銀行 (824) 帳號：<strong id="bankAcct">111016905772</strong></span>
-      <button type="button" class="copy-acct-btn" id="copyAcctBtn">複製帳號</button>
-    </div>
-  </section>
-
-  <!-- 一頁式精簡表單 -->
-  <form id="orderForm" class="card">
-
-    <!-- 第 1 排：款式 + 取貨時間 -->
-    <div class="row-2">
-      <div>
-        <label class="field-label" for="cake">今日款式 <span class="required">*</span></label>
-        <select id="cake" name="cake" required>
-          <option value="">請選擇款式</option>
-        </select>
-      </div>
-      <div>
-        <label class="field-label" for="pickup">預計取貨 <span class="required">*</span></label>
-        <select id="pickup" name="pickup" required>
-          <option value="">請選擇時段</option>
-          <option value="15:00～16:00">15:00～16:00</option>
-          <option value="16:00～17:00">16:00～17:00</option>
-          <option value="17:00～18:00">17:00～18:00</option>
-          <option value="18:00～19:00">18:00～19:00</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- 第 2 排：姓名 + 電話 -->
-    <div class="row-2">
-      <div>
-        <label class="field-label" for="name">訂購人姓名 <span class="required">*</span></label>
-        <input id="name" name="name" autocomplete="name" placeholder="請輸入姓名" required>
-      </div>
-      <div>
-        <label class="field-label" for="phone">聯絡電話 <span class="required">*</span></label>
-        <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="手機號碼" required>
-      </div>
-    </div>
-
-    <!-- 第 3 排：加購項目（2人、5人、10人餐具組 + 保冷袋） -->
-    <label class="field-label">加購項目（選填）</label>
-    <div class="row-2" style="margin-bottom:6px;">
-      <label class="addon-box">
-        <input type="checkbox" id="utensils2Chk" value="15">
-        <span>🍴 2人餐具 +$15</span>
-      </label>
-      <label class="addon-box">
-        <input type="checkbox" id="utensils5Chk" value="30">
-        <span>🍴 5人餐具 +$30</span>
-      </label>
-    </div>
-    <div class="row-2">
-      <label class="addon-box">
-        <input type="checkbox" id="utensils10Chk" value="50">
-        <span>🍴 10人餐具 +$50</span>
-      </label>
-      <label class="addon-box">
-        <input type="checkbox" id="coolerChk" value="100">
-        <span>🧊 保冷袋組 +$100</span>
-      </label>
-    </div>
-
-    <!-- 第 4 排：勾選已付款 + 填寫後五碼 -->
-    <label class="field-label">付款狀態（已匯款請打勾並填後五碼）</label>
-    <div class="row-2">
-      <label class="addon-box">
-        <input type="checkbox" id="paidChk">
-        <span>💰 已付款</span>
-      </label>
-      <div>
-        <input id="last5" name="last5" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" placeholder="轉帳帳號後五碼">
-      </div>
-    </div>
-
-    <!-- 第 5 排：備註 -->
-    <div style="margin-bottom:4px;">
-      <input id="note" name="note" placeholder="訂購備註（選填，如有其他需求請填寫）">
-    </div>
-
-    <!-- 確認條款 -->
-    <label class="agree-line">
-      <input type="checkbox" name="agreement" value="同意" required>
-      <span>我已確認款式、金額及取貨時間，了解須由店家確認收款後才算預留成功，預留後恕不取消退款。</span>
-    </label>
-
-    <!-- 底部總金額與送出按鈕 -->
-    <div class="footer-bar">
-      <div class="price-summary">
-        <div class="label">應付總金額</div>
-        <div class="grand-total" id="total">$700</div>
-      </div>
-      <button class="submit" id="submitBtn" type="submit">
-        確認並前往 LINE ➔
-      </button>
-    </div>
-
-  </form>
+<body class="bg-[#FBF9F5] text-stone-800 p-2 sm:p-4 min-h-screen flex justify-center items-start font-sans">
+<div class="max-w-md w-full bg-white rounded-2xl shadow-sm p-4 sm:p-5 border border-stone-200 my-2 relative">
+<!-- 表頭標題（點擊蛋糕可觸發店長管理密碼輸入，右上角提供試算表連線狀態） -->
+<div class="relative mb-3">
+<!-- 右上角：連線狀態（小尺寸） -->
+<div class="absolute right-0 top-0 z-10">
+<button type="button" id="checkCloudSyncBtn" title="點擊重新檢測試算表連線" class="inline-flex items-center text-[10px] bg-stone-100 hover:bg-stone-200 active:scale-95 text-stone-600 px-2 py-0.5 rounded-full border border-stone-200 transition duration-150 select-none cursor-pointer">
+🔄 檢測中
+</button>
 </div>
 
-<!-- 店家專用設定面板（連點 3 下蛋糕圖示驗證後開啟） -->
-<section class="admin-panel" id="adminPanel" hidden>
-  <div class="admin-title">
-    <span>🛠️ 店家每日款式設定（同步至試算表）</span>
-    <button type="button" id="closeAdmin" style="border:0;background:none;cursor:pointer;font-size:16px;">✕</button>
-  </div>
-
-  <div class="admin-subtitle">▸ 基本字母款（A～J）</div>
-  <div class="style-grid" id="gridLetters"></div>
-
-  <div class="admin-subtitle">▸ 編號細分款（A1～J4，點左側可整排全選）</div>
-  <div id="gridNumbers"></div>
-
-  <div class="admin-subtitle">▸ 熱門指定款</div>
-  <div class="style-grid grid-2" id="gridSpecials"></div>
-
-  <div class="admin-subtitle">▸ 自訂輸入款（最多 4 個，輸入即自動加入）</div>
-  <div class="custom-grid">
-    <input type="text" class="custom-style-input" placeholder="自訂款式 1">
-    <input type="text" class="custom-style-input" placeholder="自訂款式 2">
-    <input type="text" class="custom-style-input" placeholder="自訂款式 3">
-    <input type="text" class="custom-style-input" placeholder="自訂款式 4">
-  </div>
-
-  <div class="admin-quick">
-    <button type="button" id="presetAEBtn">預設 A～E</button>
-    <button type="button" id="presetAJBtn">全選 A～J</button>
-    <button type="button" id="presetA1E4Btn">選 A1～E4</button>
-    <button type="button" id="clearAllBtn">全部清空</button>
-  </div>
-
-  <label class="admin-lock-opt">
-    <input type="checkbox" id="lockDateChk" checked>
-    <span>🔒 綁定今日日期（隔天午夜 12 點後自動過期鎖定表單）</span>
-  </label>
-
-  <div class="admin-actions">
-    <button type="button" id="saveCloudBtn" class="primary">☁️ 儲存並同步至 Google 試算表（全客人生效）</button>
-    <button type="button" id="copyLinkBtn" class="secondary">🔗 複製專用網址連結（備用）</button>
-    <button type="button" id="copyHtmlBtn" class="secondary">📋 亦可產生並複製今日 HTML 程式碼</button>
-  </div>
-
-  <div class="copy-box" id="copyBox" hidden>
-    <div class="copy-status" id="copyStatus">✅ 處理完成！</div>
-    <textarea id="outputField" readonly onclick="this.select()"></textarea>
-  </div>
-</section>
-
-<!-- 密碼輸入彈窗 -->
-<div class="modal-overlay" id="pwdModal" hidden>
-  <div class="pwd-card">
-    <div class="pwd-icon">🎂</div>
-    <div class="pwd-title">店家管理員身分驗證</div>
-    <input type="password" id="adminPwdInput" class="pwd-input" inputmode="numeric" placeholder="請輸入密碼" maxlength="10" autocomplete="off" />
-    <div class="pwd-error" id="pwdError"></div>
-    <div class="pwd-actions">
-      <button type="button" class="pwd-btn cancel" id="pwdCancelBtn">取消</button>
-      <button type="button" class="pwd-btn confirm" id="pwdConfirmBtn">確認送出</button>
-    </div>
-  </div>
+<div class="text-center pt-5 sm:pt-3">
+<h1 class="text-lg font-bold text-stone-800 flex items-center justify-center gap-1.5">
+<span id="adminCakeBtn" class="cursor-pointer select-none active:scale-90 transition-transform text-xl p-0.5 rounded hover:bg-stone-100" title="管理設定">🎂</span>
+<span>WUYI 蛋糕訂購預訂單</span>
+</h1>
+<p class="text-[11px] text-stone-500 mt-0.5">填妥後將自動前往 LINE 官方私訊，由客服為您報價確認</p>
 </div>
-
 </div>
-
-<!-- 預設設定資料區塊（當網路離線或無雲端連線時的保底設定） -->
-<script id="configScript">
-window.BURGER_CONFIG = {
-  "styles": [
-    "A 款",
-    "B 款",
-    "C 款",
-    "D 款",
-    "E 款"
-  ],
-  "validDate": ""
-};
-</script>
-
-<script id="mainScript">
-// ==================== 雲端 Google Apps Script 設定 ====================
-const GAS_CALENDAR_API = "https://script.google.com/macros/s/AKfycbzVxDkFO8UDZHUZYhiwGSFsTU4v6Ilbp0mgLXHEiXtDYYv_9p3epdF_y1IoWwSalqVx/exec";
-const CALENDAR_CATEGORY = "Burger";
-const STORAGE_KEY_BURGER = "BURGER_CONFIG_" + CALENDAR_CATEGORY;
-const ADMIN_PASSWORD = "5151";
-
-// DOM 元素選取
-const secretTrigger = document.getElementById("secretTrigger");
-const pwdModal = document.getElementById("pwdModal");
-const adminPanel = document.getElementById("adminPanel");
-const adminPwdInput = document.getElementById("adminPwdInput");
-const pwdError = document.getElementById("pwdError");
-const pwdCancelBtn = document.getElementById("pwdCancelBtn");
-const pwdConfirmBtn = document.getElementById("pwdConfirmBtn");
-const closeAdmin = document.getElementById("closeAdmin");
-const lockDateChk = document.getElementById("lockDateChk");
-const saveCloudBtn = document.getElementById("saveCloudBtn");
-const copyLinkBtn = document.getElementById("copyLinkBtn");
-const copyHtmlBtn = document.getElementById("copyHtmlBtn");
-const copyBox = document.getElementById("copyBox");
-const copyStatus = document.getElementById("copyStatus");
-const outputField = document.getElementById("outputField");
-const cloudSyncStatus = document.getElementById("cloudSyncStatus");
-const dateBadge = document.getElementById("dateBadge");
-const expiredCard = document.getElementById("expiredCard");
-const activeContent = document.getElementById("activeContent");
-const cakeSelect = document.getElementById("cake");
-const customInputs = Array.from(document.querySelectorAll(".custom-style-input"));
-
-function getTodayInfo() {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  const d = String(now.getDate()).padStart(2, "0");
-  return {
-    full: `${y}-${m}-${d}`,
-    short: `${now.getMonth() + 1}/${now.getDate()}`
-  };
-}
-
-// 正規化日期字串（防止 Google 試算表回傳 ISO 日期格式導致解析異常）
-function normalizeDateStr(raw) {
-  if (!raw) return "";
-  const str = String(raw).trim();
-  const match = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
-  if (match) {
-    return `${match[1]}-${match[2].padStart(2, "0")}-${match[3].padStart(2, "0")}`;
-  }
-  if (str.includes("T")) {
-    const dt = new Date(str);
-    if (!isNaN(dt.getTime())) {
-      const y = dt.getFullYear();
-      const m = String(dt.getMonth() + 1).padStart(2, "0");
-      const d = String(dt.getDate()).padStart(2, "0");
-      return `${y}-${m}-${d}`;
-    }
-  }
-  return str;
-}
-
-// 全形字元轉半形並去頭尾空格
-function normalizeInput(val) {
-  return (val || "")
-    .trim()
-    .replace(/[\uff01-\uff5e]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xfee0))
-    .replace(/\u3000/g, " ");
-}
-
-// 建立款式清單常數
-const LETTERS = ["A","B","C","D","E","F","G","H","I","J"];
-const GROUP_LETTERS = LETTERS.map(l => `${l} 款`);
-const GROUP_NUMBERS = [];
-LETTERS.forEach(l => {
-  for (let i = 1; i <= 4; i++) GROUP_NUMBERS.push(`${l}${i} 款`);
-});
-const GROUP_SPECIALS = ["水果款","圍邊可可款"];
-const ALL_PRESETS = [...GROUP_LETTERS, ...GROUP_NUMBERS, ...GROUP_SPECIALS];
-
-let selectedPresets = [];
-let burgerConfig = {
-  styles: ["A 款","B 款","C 款","D 款","E 款"],
-  validDate: ""
-};
-
-// 複製純銀行帳號
-const BANK_ACCOUNT = "111016905772";
-const copyAcctBtn = document.getElementById("copyAcctBtn");
-if (copyAcctBtn) {
-  copyAcctBtn.addEventListener("click", async () => {
-    let ok = false;
-    if (navigator.clipboard && window.isSecureContext) {
-      try {
-        await navigator.clipboard.writeText(BANK_ACCOUNT);
-        ok = true;
-      } catch (e) { ok = false; }
-    }
-    if (!ok) {
-      const temp = document.createElement("input");
-      temp.value = BANK_ACCOUNT;
-      document.body.appendChild(temp);
-      temp.select();
-      temp.setSelectionRange(0, 99);
-      try { ok = document.execCommand("copy"); } catch (e) {}
-      document.body.removeChild(temp);
-    }
-    copyAcctBtn.textContent = "✅ 已複製帳號";
-    setTimeout(() => { copyAcctBtn.textContent = "複製帳號"; }, 2000);
-  });
-}
-
-// 解析網址參數（支援 ?s=A,B,C&d=2026-10-28）
-function getUrlConfig() {
-  let search = window.location.search;
-  let hash = window.location.hash;
-  let params = new URLSearchParams(search);
-  if (!params.get("s") && !params.get("styles") && hash.includes("=")) {
-    params = new URLSearchParams(hash.replace(/^#/, ""));
-  }
-
-  const rawStyles = params.get("s") || params.get("styles");
-  const rawDate = params.get("d") || params.get("date");
-
-  if (!rawStyles && !rawDate) return null;
-
-  let parsedStyles = [];
-  if (rawStyles) {
-    parsedStyles = rawStyles.split(",").map(item => {
-      item = item.trim();
-      if (!item) return "";
-      if (/^[A-J][1-4]?$/i.test(item)) {
-        return item.toUpperCase() + " 款";
-      }
-      return item.endsWith("款") ? item : item + " 款";
-    }).filter(Boolean);
-  }
-
-  return {
-    styles: parsedStyles.length > 0 ? parsedStyles : null,
-    validDate: normalizeDateStr(rawDate)
-  };
-}
-
-// 套用設定到介面中
-function applyConfig(cfg) {
-  if (!cfg) return;
-  burgerConfig = {
-    styles: Array.isArray(cfg.styles) && cfg.styles.length > 0 ? cfg.styles : ["A 款","B 款","C 款","D 款","E 款"],
-    validDate: normalizeDateStr(cfg.validDate)
-  };
-
-  const todayInfo = getTodayInfo();
-  if (burgerConfig.validDate) {
-    const parts = burgerConfig.validDate.split("-");
-    const shortValid = parts.length === 3 ? `${Number(parts[1])}/${Number(parts[2])}` : burgerConfig.validDate;
-    dateBadge.textContent = `${shortValid} 限定`;
-
-    if (burgerConfig.validDate !== todayInfo.full) {
-      activeContent.hidden = true;
-      expiredCard.hidden = false;
-      document.getElementById("expiredDateText").textContent = shortValid;
-    } else {
-      activeContent.hidden = false;
-      expiredCard.hidden = true;
-    }
-  } else {
-    dateBadge.textContent = `${todayInfo.short} 限定`;
-    activeContent.hidden = false;
-    expiredCard.hidden = true;
-  }
-
-  // 同步面板中的勾選狀態
-  selectedPresets = [];
-  customInputs.forEach(inp => inp.value = "");
-  let cIdx = 0;
-  (burgerConfig.styles || []).forEach(item => {
-    if (ALL_PRESETS.includes(item)) {
-      selectedPresets.push(item);
-    } else if (item && item !== "（今日尚無款式）" && cIdx < customInputs.length) {
-      customInputs[cIdx].value = item;
-      cIdx++;
-    }
-  });
-
-  if (lockDateChk) {
-    lockDateChk.checked = !!burgerConfig.validDate;
-  }
-
-  renderSelect();
-  renderAllAdminButtons();
-}
-
-function getActiveStyles() {
-  const orderedPresets = ALL_PRESETS.filter(item => selectedPresets.includes(item));
-  const customValues = customInputs.map(input => input.value.trim()).filter(Boolean);
-  const combined = [...orderedPresets, ...customValues];
-  return combined.length > 0 ? combined : ["（今日尚無款式）"];
-}
-
-function renderSelect() {
-  const prevValue = cakeSelect.value;
-  const styles = getActiveStyles();
-  cakeSelect.innerHTML = "";
-
-  const defaultOpt = document.createElement("option");
-  defaultOpt.value = "";
-  defaultOpt.textContent = "請選擇款式";
-  cakeSelect.appendChild(defaultOpt);
-
-  styles.forEach(s => {
-    const opt = document.createElement("option");
-    if (s === "（今日尚無款式）") {
-      opt.value = "";
-      opt.textContent = s;
-      opt.disabled = true;
-    } else {
-      opt.value = s;
-      opt.textContent = s;
-    }
-    cakeSelect.appendChild(opt);
-  });
-
-  if (prevValue && styles.includes(prevValue) && prevValue !== "（今日尚無款式）") {
-    cakeSelect.value = prevValue;
-  }
-}
-
-function togglePreset(label) {
-  if (selectedPresets.includes(label)) {
-    selectedPresets = selectedPresets.filter(item => item !== label);
-  } else {
-    selectedPresets.push(label);
-  }
-  renderAllAdminButtons();
-  renderSelect();
-}
-
-function renderSimpleGroup(containerId, list) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = "";
-  list.forEach(label => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "style-btn" + (selectedPresets.includes(label) ? " active" : "");
-    btn.textContent = label.replace(" 款", "");
-    if (containerId === "gridSpecials") btn.textContent = label;
-    btn.onclick = () => togglePreset(label);
-    container.appendChild(btn);
-  });
-}
-
-function renderNumberRows() {
-  const container = document.getElementById("gridNumbers");
-  if (!container) return;
-  container.innerHTML = "";
-  LETTERS.forEach(letter => {
-    const row = document.createElement("div");
-    row.className = "num-row";
-
-    const rowItems = [1,2,3,4].map(n => `${letter}${n} 款`);
-    const allChecked = rowItems.every(item => selectedPresets.includes(item));
-
-    const toggleBtn = document.createElement("button");
-    toggleBtn.type = "button";
-    toggleBtn.className = "row-toggle-btn";
-    toggleBtn.textContent = `${letter}全`;
-    toggleBtn.onclick = () => {
-      if (allChecked) {
-        selectedPresets = selectedPresets.filter(item => !rowItems.includes(item));
-      } else {
-        rowItems.forEach(item => {
-          if (!selectedPresets.includes(item)) selectedPresets.push(item);
-        });
-      }
-      renderAllAdminButtons();
-      renderSelect();
-    };
-    row.appendChild(toggleBtn);
-
-    rowItems.forEach(label => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "style-btn" + (selectedPresets.includes(label) ? " active" : "");
-      btn.textContent = label.replace(" 款", "");
-      btn.onclick = () => togglePreset(label);
-      row.appendChild(btn);
-    });
-
-    container.appendChild(row);
-  });
-}
-
-function renderAllAdminButtons() {
-  renderSimpleGroup("gridLetters", GROUP_LETTERS);
-  renderNumberRows();
-  renderSimpleGroup("gridSpecials", GROUP_SPECIALS);
-}
-
-customInputs.forEach(input => input.addEventListener("input", renderSelect));
-
-// 連點 3 下觸發密碼驗證彈窗
-let clickCount = 0;
-let clickTimer = null;
-
-if (secretTrigger) {
-  secretTrigger.addEventListener("click", () => {
-    clickCount++;
-    clearTimeout(clickTimer);
-    if (clickCount >= 3) {
-      clickCount = 0;
-      openPwdModal();
-    } else {
-      clickTimer = setTimeout(() => { clickCount = 0; }, 600);
-    }
-  });
-}
-
-function openPwdModal() {
-  pwdError.textContent = "";
-  adminPwdInput.value = "";
-  pwdModal.hidden = false;
-  setTimeout(() => { adminPwdInput.focus(); }, 100);
-}
-
-function closePwdModal() {
-  pwdModal.hidden = true;
-  adminPwdInput.value = "";
-  pwdError.textContent = "";
-}
-
-if (pwdCancelBtn) pwdCancelBtn.addEventListener("click", closePwdModal);
-if (pwdModal) {
-  pwdModal.addEventListener("click", (e) => {
-    if (e.target === pwdModal) closePwdModal();
-  });
-}
-
-function verifyPassword() {
-  const entered = normalizeInput(adminPwdInput.value);
-  if (entered === ADMIN_PASSWORD) {
-    closePwdModal();
-    adminPanel.hidden = false;
-    renderAllAdminButtons();
-    adminPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-  } else {
-    pwdError.textContent = "密碼錯誤，請重新輸入！";
-    adminPwdInput.focus();
-    adminPwdInput.select();
-  }
-}
-
-if (pwdConfirmBtn) pwdConfirmBtn.addEventListener("click", verifyPassword);
-if (adminPwdInput) {
-  adminPwdInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      verifyPassword();
-    } else if (e.key === "Escape") {
-      closePwdModal();
-    }
-  });
-}
-
-if (closeAdmin) closeAdmin.onclick = () => { adminPanel.hidden = true; };
-
-document.getElementById("presetAEBtn").onclick = () => {
-  selectedPresets = ["A 款","B 款","C 款","D 款","E 款"];
-  renderAllAdminButtons();
-  renderSelect();
-};
-
-document.getElementById("presetAJBtn").onclick = () => {
-  selectedPresets = [...GROUP_LETTERS];
-  renderAllAdminButtons();
-  renderSelect();
-};
-
-document.getElementById("presetA1E4Btn").onclick = () => {
-  selectedPresets = GROUP_NUMBERS.slice(0, 20);
-  renderAllAdminButtons();
-  renderSelect();
-};
-
-document.getElementById("clearAllBtn").onclick = () => {
-  selectedPresets = [];
-  customInputs.forEach(input => { input.value = ""; });
-  renderAllAdminButtons();
-  renderSelect();
-};
-
-// ==================== 從 Google 試算表 (GAS) 載入設定 ====================
-async function loadBurgerFromGAS() {
-  let localCache = null;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY_BURGER);
-    if (raw) localCache = JSON.parse(raw);
-  } catch (e) {}
-
-  const urlCfg = getUrlConfig();
-  if (urlCfg) {
-    applyConfig(urlCfg);
-  } else if (localCache) {
-    applyConfig(localCache);
-  } else if (window.BURGER_CONFIG) {
-    applyConfig(window.BURGER_CONFIG);
-  }
-
-  // 從 Google Apps Script 雲端同步
-  try {
-    if (cloudSyncStatus) {
-      cloudSyncStatus.innerHTML = '🔄 同步中...';
-      cloudSyncStatus.className = 'cloud-status-badge syncing';
-    }
-
-    const res = await fetch(`${GAS_CALENDAR_API}?category=${encodeURIComponent(CALENDAR_CATEGORY)}&t=${Date.now()}`, {
-      method: "GET"
-    });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const json = await res.json();
-
-    if (json && (json.status === "success" || json.data || json[CALENDAR_CATEGORY])) {
-      let data = json.data || json;
-      if (data && data[CALENDAR_CATEGORY]) data = data[CALENDAR_CATEGORY];
-
-      const cloudConfig = {
-        styles: Array.isArray(data.styles) ? data.styles : (data.styles ? String(data.styles).split(",").map(s => s.trim()).filter(Boolean) : null),
-        validDate: normalizeDateStr(data.validDate)
-      };
-
-      if (!urlCfg && cloudConfig.styles && cloudConfig.styles.length > 0) {
-        applyConfig(cloudConfig);
-        try {
-          localStorage.setItem(STORAGE_KEY_BURGER, JSON.stringify(cloudConfig));
-        } catch (e) {}
-      }
-
-      if (cloudSyncStatus) {
-        cloudSyncStatus.innerHTML = `☁️ 試算表已連線 (${CALENDAR_CATEGORY})`;
-        cloudSyncStatus.className = 'cloud-status-badge';
-      }
-    }
-  } catch (err) {
-    console.warn("GAS 讀取失敗，使用離線設定：", err);
-    if (cloudSyncStatus) {
-      cloudSyncStatus.innerHTML = `☁️ 離線快取 (${CALENDAR_CATEGORY})`;
-      cloudSyncStatus.className = 'cloud-status-badge offline';
-    }
-  }
-}
-
-// ==================== 儲存至 Google 試算表 ====================
-if (saveCloudBtn) {
-  saveCloudBtn.addEventListener("click", async function() {
-    const btn = saveCloudBtn;
-    const origHtml = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<span>☁️ 雲端同步儲存中...</span>';
-
-    const activeStyles = getActiveStyles();
-    const currentToday = getTodayInfo();
-    const useLock = lockDateChk.checked;
-
-    const payload = {
-      category: CALENDAR_CATEGORY,
-      updatedAt: new Date().toISOString(),
-      styles: activeStyles,
-      validDate: useLock ? currentToday.full : ""
-    };
-
-    try {
-      // 1. 先存入本機 LocalStorage
-      try {
-        localStorage.setItem(STORAGE_KEY_BURGER, JSON.stringify(payload));
-      } catch (e) {}
-
-      // 2. 立即更新當前頁面
-      applyConfig(payload);
-
-      // 3. 發送至 Google Apps Script 試算表
-      try {
-        await fetch(GAS_CALENDAR_API, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        });
-      } catch (postErr) {
-        console.warn("GAS POST 轉址或網路提示（後端已記錄）：", postErr);
-      }
-
-      adminPanel.hidden = true;
-      if (cloudSyncStatus) {
-        cloudSyncStatus.innerHTML = `☁️ 試算表已連線 (${CALENDAR_CATEGORY})`;
-        cloudSyncStatus.className = 'cloud-status-badge';
-      }
-      setTimeout(() => {
-        alert(`✅ 漢堡現貨款式 (${CALENDAR_CATEGORY}) 已成功同步至 Google 試算表！\n所有客人開啟頁面時將自動生效！`);
-      }, 150);
-
-    } catch (err) {
-      console.error("雲端儲存失敗：", err);
-      adminPanel.hidden = true;
-      setTimeout(() => {
-        alert("⚠️ 已儲存於本機快取！若無法連線請檢查網路狀態。");
-      }, 150);
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = origHtml;
-    }
-  });
-}
-
-// 輔助功能：複製剪貼簿
-async function copyTextToClipboard(text) {
-  let ok = false;
-  if (navigator.clipboard && window.isSecureContext) {
-    try {
-      await navigator.clipboard.writeText(text);
-      ok = true;
-    } catch (e) { ok = false; }
-  }
-  if (!ok) {
-    try {
-      outputField.value = text;
-      outputField.focus();
-      outputField.select();
-      outputField.setSelectionRange(0, 999999);
-      ok = document.execCommand("copy");
-    } catch (e) { ok = false; }
-  }
-  return ok;
-}
-
-// 動作 2：複製專用網址連結（備用）
-copyLinkBtn.onclick = async () => {
-  const activeStyles = getActiveStyles();
-  const currentToday = getTodayInfo();
-  const useLock = lockDateChk.checked;
-
-  let baseUrl = window.location.href.split("?")[0].split("#")[0];
-  const params = new URLSearchParams();
-  const shortStyles = activeStyles.map(s => s.replace(/ 款$/, ""));
-  params.set("s", shortStyles.join(","));
-  if (useLock) {
-    params.set("d", currentToday.full);
-  }
-
-  const shareUrl = baseUrl + "?" + params.toString();
-  copyBox.hidden = false;
-  outputField.value = shareUrl;
-
-  const copied = await copyTextToClipboard(shareUrl);
-  if (copied) {
-    copyStatus.textContent = `✅ 已複製備用專用網址！（共 ${activeStyles.length} 款）`;
-    copyLinkBtn.textContent = "✅ 連結複製成功！";
-  } else {
-    copyStatus.textContent = "👇 請點下方框框全選並複製生效連結：";
-    outputField.focus();
-    outputField.select();
-  }
-  setTimeout(() => { copyLinkBtn.textContent = "🔗 複製專用網址連結（備用）"; }, 3000);
-};
-
-// 動作 3：產生並複製今日 HTML 程式碼
-copyHtmlBtn.onclick = async () => {
-  const activeStyles = getActiveStyles();
-  const currentToday = getTodayInfo();
-  const useLock = lockDateChk.checked;
-
-  const clone = document.documentElement.cloneNode(true);
-  clone.querySelector("#adminPanel").setAttribute("hidden", "");
-  clone.querySelector("#pwdModal").setAttribute("hidden", "");
-  clone.querySelector("#copyBox").setAttribute("hidden", "");
-  clone.querySelector("#expiredCard").setAttribute("hidden", "");
-  clone.querySelector("#activeContent").removeAttribute("hidden");
-  clone.querySelector("#gridLetters").innerHTML = "";
-  clone.querySelector("#gridNumbers").innerHTML = "";
-  clone.querySelector("#gridSpecials").innerHTML = "";
-  clone.querySelector("#outputField").value = "";
-  clone.querySelector("#outputField").textContent = "";
-  clone.querySelector("#adminPwdInput").value = "";
-  clone.querySelector("#pwdError").textContent = "";
-  const existingFallback = clone.querySelector("#lineFallbackLink");
-  if (existingFallback) existingFallback.remove();
-
-  clone.querySelectorAll(".custom-style-input").forEach((inp, idx) => {
-    const customVal = customInputs[idx] ? customInputs[idx].value.trim() : "";
-    if (customVal) {
-      inp.setAttribute("value", customVal);
-    } else {
-      inp.removeAttribute("value");
-    }
-  });
-
-  const newConfigObj = {
-    styles: activeStyles,
-    validDate: useLock ? currentToday.full : ""
-  };
-  clone.querySelector("#configScript").textContent =
-    `\nwindow.BURGER_CONFIG = ${JSON.stringify(newConfigObj, null, 2)};\n`;
-
-  const fullHtml = "<!DOCTYPE html>\n" + clone.outerHTML;
-  copyBox.hidden = false;
-  outputField.value = fullHtml;
-
-  const copied = await copyTextToClipboard(fullHtml);
-  if (copied) {
-    copyStatus.textContent = `✅ 已複製今日 HTML！`;
-    copyHtmlBtn.textContent = "✅ HTML 複製成功！";
-  } else {
-    copyStatus.textContent = "👇 請點下方框框全選並複製 HTML：";
-    outputField.focus();
-    outputField.select();
-  }
-  setTimeout(() => { copyHtmlBtn.textContent = "📋 亦可產生並複製今日 HTML 程式碼"; }, 3000);
-};
-
-// 表單計算與付款連動
-const form = document.getElementById("orderForm");
-const paidChk = document.getElementById("paidChk");
-const last5 = document.getElementById("last5");
-const phoneInput = document.getElementById("phone");
-const utensils2Chk = document.getElementById("utensils2Chk");
-const utensils5Chk = document.getElementById("utensils5Chk");
-const utensils10Chk = document.getElementById("utensils10Chk");
-const coolerChk = document.getElementById("coolerChk");
-
-function updateTotal() {
-  const u2 = utensils2Chk.checked ? 15 : 0;
-  const u5 = utensils5Chk.checked ? 30 : 0;
-  const u10 = utensils10Chk.checked ? 50 : 0;
-  const utensilsTotal = u2 + u5 + u10;
-  const cooler = coolerChk.checked ? 100 : 0;
-  document.getElementById("total").textContent = "$" + (700 + utensilsTotal + cooler);
-}
-
-paidChk.addEventListener("change", () => {
-  last5.required = paidChk.checked;
-  if (paidChk.checked) {
-    last5.focus();
-  } else {
-    last5.value = "";
-  }
-});
-
-last5.addEventListener("input", () => {
-  const cleaned = normalizeInput(last5.value).replace(/\D/g, "").slice(0, 5);
-  if (last5.value !== cleaned) {
-    last5.value = cleaned;
-  }
-  if (cleaned.length > 0) {
-    paidChk.checked = true;
-    last5.required = true;
-  } else {
-    paidChk.checked = false;
-    last5.required = false;
-  }
-});
-
-if (phoneInput) {
-  phoneInput.addEventListener("blur", () => {
-    phoneInput.value = normalizeInput(phoneInput.value);
-  });
-}
-
-form.addEventListener("change", updateTotal);
-
-form.addEventListener("submit", function(event) {
-  event.preventDefault();
-  if (!form.reportValidity()) return;
-
-  const data = new FormData(form);
-  const u2 = utensils2Chk.checked ? 15 : 0;
-  const u5 = utensils5Chk.checked ? 30 : 0;
-  const u10 = utensils10Chk.checked ? 50 : 0;
-  const utensilsTotal = u2 + u5 + u10;
-  const cooler = coolerChk.checked ? 100 : 0;
-  const total = 700 + utensilsTotal + cooler;
-  const isPaid = paidChk.checked;
-  const currentToday = getTodayInfo();
-
-  let tablewareItems = [];
-  if (utensils2Chk.checked) tablewareItems.push("2人餐具($15)");
-  if (utensils5Chk.checked) tablewareItems.push("5人餐具($30)");
-  if (utensils10Chk.checked) tablewareItems.push("10人餐具($50)");
-  const tablewareText = tablewareItems.length > 0 ? tablewareItems.join("、") : "不需要";
-
-  const message = [
-    `🍔【${currentToday.short} 現貨漢堡盒預留需求】`,
-    "",
-    "款式：" + (data.get("cake") || "").trim(),
-    "訂購人：" + (data.get("name") || "").trim(),
-    "聯絡電話：" + normalizeInput(data.get("phone") || ""),
-    "預計取貨：" + data.get("pickup"),
-    "",
-    "【加購項目】",
-    "餐具組：" + tablewareText,
-    "保冷袋及保冷劑：" + (cooler ? "需要（$100）" : "不需要"),
-    "",
-    "蛋糕金額：$700",
-    "餐具金額：$" + utensilsTotal,
-    "保冷組金額：$" + cooler,
-    "應付總金額：$" + total,
-    "",
-    "付款狀態：" + (isPaid ? "已付款" : "尚未付款"),
-    "轉帳後五碼：" + (isPaid ? data.get("last5") : "尚未提供"),
-    "",
-    "備註：" + ((data.get("note") || "").trim() || "無"),
-    "",
-    "我了解需由店家確認款式及收到款項後，才算預留成功。"
-  ].join("\n");
-
-  const lineURL =
-    "https://line.me/R/oaMessage/%40230fpemy/?" +
-    encodeURIComponent(message);
-
-  const lineWindow = window.open(lineURL, "_blank");
-
-  if (!lineWindow) {
-    let fallback = document.getElementById("lineFallbackLink");
-    if (!fallback) {
-      fallback = document.createElement("a");
-      fallback.id = "lineFallbackLink";
-      fallback.target = "_blank";
-      fallback.rel = "noopener";
-      fallback.textContent = "點此開啟 LINE 並傳送訂購資料";
-      fallback.style.cssText =
-        "display:block;padding:12px;margin-top:10px;text-align:center;" +
-        "background:#d69b8c;color:white;border-radius:8px;font-weight:bold;text-decoration:none;";
-      form.insertAdjacentElement("afterend", fallback);
-    }
-    fallback.href = lineURL;
-    fallback.focus();
-  }
-});
-
-// 頁面初始化
-updateTotal();
-loadBurgerFromGAS();
-</script>
-
+<!-- 送出成功後的覆蓋畫面（加強防漏單警告） -->
+<div id="successOverlay" class="hidden text-center py-5 space-y-3">
+<div class="text-4xl animate-bounce">📱</div>
+<h2 class="text-lg font-bold text-stone-800">正在為您開啟 LINE 客服...</h2>
+<!-- ⚠️ 關鍵防呆：提醒客人一定要按發送 -->
+<div class="bg-rose-50 border-2 border-rose-300 rounded-xl p-3 text-left">
+<p class="text-xs font-bold text-rose-700 flex items-center gap-1 mb-1">
+<span>⚠️</span> 重要最後一步（請勿漏掉）：
+</p>
+<p class="text-[11px] text-rose-600 leading-relaxed">
+1. 進入 LINE 聊天室後，<strong>務必按下對話框右下角的【傳送鍵】</strong>，我們才收得到訂單喔！<br>
+2. 傳送後，請記得隨手<strong>上傳蛋糕參考圖片</strong>方便我們報價。
+</p>
+</div>
+<div class="pt-1 space-y-2">
+<button type="button" id="copyOrderBtn" class="w-full bg-stone-100 hover:bg-stone-200 active:scale-[0.99] text-stone-700 font-bold py-2.5 rounded-xl border border-stone-300 transition duration-200 text-xs flex items-center justify-center gap-1.5 shadow-sm">
+<span>📋</span> <span id="copyOrderBtnText">點此手動複製訂購內容</span>
+</button>
+<a id="lineManualBtn" href="https://a0952015080-netizen.github.io/wuyi-order/#" target="_blank" rel="noopener noreferrer" class="inline-block w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-3.5 rounded-xl shadow transition duration-200 text-sm">
+👉 若未自動跳轉，請點此開啟 LINE
+</a>
+</div>
+</div>
+<!-- 一頁式表單本體 -->
+<form id="cakeOrderForm" class="space-y-2.5">
+<!-- 1. 尺寸與口味並排 -->
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block text-xs font-semibold mb-1 text-stone-700">蛋糕尺寸 <span class="text-red-500">*</span></label>
+<select id="size" required class="w-full border border-stone-300 rounded-lg p-2 bg-white outline-none focus:border-stone-600 text-xs">
+<option value="">選擇尺寸</option>
+<option value="漢堡盒 (4吋一層夾餡)">漢堡盒 (4吋一層)</option>
+<option value="4 吋整模 (兩層夾餡)">4 吋整模 (兩層)</option>
+<option value="6 吋整模 (兩層夾餡)">6 吋整模 (兩層)</option>
+<option value="8 吋整模 (兩層夾餡)">8 吋整模 (兩層)</option>
+</select>
+</div>
+<div>
+<label class="block text-xs font-semibold mb-1 text-stone-700">蛋糕口味 <span class="text-red-500">*</span></label>
+<select id="flavor" required class="w-full border border-stone-300 rounded-lg p-2 bg-white outline-none focus:border-stone-600 text-xs">
+<option value="">先選尺寸</option>
+</select>
+</div>
+</div>
+<p id="flavorHint" class="text-[10px] text-amber-700 hidden"></p>
+<!-- 2. 需加購項目（已加入互斥防呆） -->
+<div>
+<label class="block text-xs font-semibold mb-1 text-stone-700">需加購（可複選）</label>
+<div class="grid grid-cols-2 gap-1.5 text-xs text-stone-600 bg-stone-50 p-2 rounded-xl border border-stone-200">
+<label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="2人餐具 $15" class="rounded" /> 2人餐具 $15</label>
+<label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="5人餐具 $30" class="rounded" /> 5人餐具 $30</label>
+<label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="10人餐具 $50" class="rounded" /> 10人餐具 $50</label>
+<label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="生日插牌／蠟燭" class="rounded" /> 生日插牌／蠟燭</label>
+<label class="flex items-center gap-1.5"><input type="checkbox" id="candleCheckbox" name="addons" value="數字蠟燭 $30/支" class="rounded" /> 數字蠟燭 $30/支</label>
+<label class="flex items-center gap-1.5"><input type="checkbox" name="addons" value="保冰袋/劑 $100" class="rounded" /> 保冰袋/劑 $100</label>
+<label class="flex items-center gap-1.5 col-span-2"><input type="checkbox" id="noAddonsCheckbox" name="addons" value="無" class="rounded" /> 無加購</label>
+</div>
+<!-- 數字蠟燭歲數欄 -->
+<div id="candleField" class="hidden mt-1 p-2 bg-amber-50 rounded-lg border border-amber-200">
+<label class="block text-[11px] font-semibold text-amber-900 mb-0.5">🕯️ 數字蠟燭歲數（必填歲數或填問號）：<span class="text-red-500">*</span></label>
+<input type="text" id="candleDetail" placeholder="例如：28 歲、數字 8、或問號" class="w-full border border-amber-300 rounded p-1.5 bg-white outline-none text-xs" />
+</div>
+</div>
+<!-- 3. 取貨日期與時間並排 -->
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block text-xs font-semibold mb-1 text-stone-700">取貨日期 <span class="text-red-500">*</span></label>
+<input type="text" id="date" placeholder="點擊選擇日期" required readonly class="w-full border border-stone-300 rounded-lg p-2 bg-white cursor-pointer outline-none focus:border-stone-600 text-xs" />
+</div>
+<div>
+<label class="block text-xs font-semibold mb-1 text-stone-700">取貨時間 <span class="text-red-500">*</span></label>
+<select id="time" required class="w-full border border-stone-300 rounded-lg p-2 bg-white outline-none focus:border-stone-600 text-xs">
+<option value="">選擇時間</option>
+<option value="15:00">15:00</option>
+<option value="15:30">15:30</option>
+<option value="16:00">16:00</option>
+<option value="16:30">16:30</option>
+<option value="17:00">17:00</option>
+<option value="17:30">17:30</option>
+<option value="18:00">18:00</option>
+<option value="18:30">18:30</option>
+<option value="19:00">19:00</option>
+</select>
+</div>
+</div>
+<!-- 提前預訂防呆與地點 -->
+<div id="bookingRulesInfo" class="p-2 bg-amber-50 rounded-lg border border-amber-200 text-[11px] text-amber-800 space-y-0.5">
+<div>⏳ <strong>預訂須知：</strong>手作新鮮蛋糕<span id="ruleDaysText"><strong>需提前一週預約</strong></span><br>（每日 18:00 截單；週一固定公休）。</div>
+<div>📍 <strong>自取地點：</strong>台南市中西區友愛街９３號</div>
+</div>
+<!-- 4. 訂購人資訊（加強手機格式防呆） -->
+<div class="space-y-2 pt-1 border-t border-stone-100">
+<div>
+<label class="block text-xs font-semibold mb-0.5 text-stone-700">訂購人 LINE 名稱 <span class="text-red-500">*</span></label>
+<input type="text" id="lineName" required placeholder="請填寫您 LINE 的顯示暱稱" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs" />
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block text-xs font-semibold mb-0.5 text-stone-700">訂購人姓名 <span class="text-red-500">*</span></label>
+<input type="text" id="name" required placeholder="王小明" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs" />
+</div>
+<div>
+<label class="block text-xs font-semibold mb-0.5 text-stone-700">訂購人電話 <span class="text-red-500">*</span></label>
+<input type="tel" id="phone" required placeholder="0912345678" maxlength="11" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs" />
+</div>
+</div>
+</div>
+<!-- 圖片提醒打勾（必勾選） -->
+<div class="p-2.5 bg-rose-50 rounded-xl border border-rose-200">
+<label class="flex items-start gap-2 cursor-pointer text-xs text-rose-900 font-medium">
+<input type="checkbox" id="photoConfirm" required class="mt-0.5 rounded text-rose-600 w-4 h-4" />
+<span>我已了解：送出訂單後，請在 LINE 聊天室<strong>傳送參考圖片最多三款</strong>以利報價 <span class="text-red-500">*</span></span>
+</label>
+</div>
+<!-- 5. 三個選填客製項目（加上字數限制防呆） -->
+<div class="space-y-2 p-2.5 bg-stone-50 rounded-xl border border-stone-200">
+<div>
+<label class="block text-[11px] font-semibold text-stone-700 mb-0.5">想要的蛋糕體顏色（選填）</label>
+<input type="text" id="cakeColor" maxlength="40" placeholder="例如：如圖款,粉,藍,紫,灰,白(或LINE討論)" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs bg-white" />
+</div>
+<div>
+<label class="block text-[11px] font-semibold text-stone-700 mb-0.5">英文題字內容（選填，限英文最多2-3字）</label>
+<input type="text" id="lettering" maxlength="30" placeholder="例如：Happy Birthday,HBD" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs bg-white" />
+</div>
+<div>
+<label class="block text-[11px] font-semibold text-stone-700 mb-0.5">其他客製需求（選填）</label>
+<input type="text" id="customNote" maxlength="50" placeholder="如有其他特殊小細節可在此填寫" class="w-full border border-stone-300 rounded-lg p-2 outline-none focus:border-stone-600 text-xs bg-white" />
+</div>
+</div>
+<!-- 6. 送出按鈕 -->
+<div class="pt-1">
+<button type="submit" id="submitBtn" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-3 rounded-xl shadow transition duration-200 flex items-center justify-center gap-1.5 text-sm">
+<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.035 9.608.391.082.922.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975 1.766-1.972 2.548-3.957 2.548-5.968z"/></svg>
+透過 LINE 送出訂單
+</button>
+</div>
+</form>
+</div>
+<!-- 🎂 管理員彈窗：密碼驗證 & 👑 店長模式日期按鈕設定面板 -->
+<div id="adminModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3 sm:p-4">
+<div class="bg-white rounded-2xl max-w-sm sm:max-w-md w-full p-4 sm:p-5 shadow-2xl border border-stone-200 space-y-3.5 max-h-[95vh] overflow-y-auto">
+<!-- 步驟 1: 輸入密碼 5151 -->
+<div id="adminStepAuth" class="space-y-3">
+<div class="flex items-center justify-between border-b pb-2">
+<h3 class="text-sm font-bold text-stone-800 flex items-center gap-1">
+<span>🎂</span> 驗證店長密碼
+</h3>
+<button type="button" id="adminCloseAuthBtn" class="text-stone-400 hover:text-stone-600 text-lg leading-none">&times;</button>
+</div>
+<p class="text-xs text-stone-600">請輸入管理密碼進入店長日期設定：</p>
+<div>
+<input type="password" id="adminPwdInput" inputmode="numeric" placeholder="請輸入管理密碼" class="w-full border border-stone-300 rounded-lg p-2.5 text-center text-sm font-mono tracking-widest outline-none focus:border-amber-600" />
+<p id="adminPwdError" class="text-[11px] text-red-500 mt-1 hidden text-center">密碼錯誤，請重新輸入！</p>
+</div>
+<div class="grid grid-cols-2 gap-2 pt-1">
+<button type="button" id="adminCancelAuthBtn" class="w-full py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-semibold">取消</button>
+<button type="button" id="adminVerifyBtn" class="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-semibold">進入店長模式</button>
+</div>
+</div>
+<!-- 步驟 2: 👑 店長模式 日曆可預訂/不可預訂 點擊設定面板 -->
+<div id="adminStepPanel" class="hidden space-y-3">
+<div class="flex items-center justify-between border-b pb-2">
+<div>
+<div class="flex items-center gap-2">
+<h3 class="text-sm font-bold text-stone-800 flex items-center gap-1">
+<span>👑</span> 店長模式：日期開放管理
+</h3>
+<span id="cloudSyncStatus" class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-medium">☁️ Google 試算表已連線</span>
+</div>
+<p class="text-[11px] text-stone-500">預設開放一個月，點選後按儲存將自動同步至雲端試算表</p>
+</div>
+<button type="button" id="adminClosePanelBtn" class="text-stone-400 hover:text-stone-600 text-lg leading-none">&times;</button>
+</div>
+<!-- ⚡ 一鍵急件解鎖捷徑 -->
+<div class="p-2.5 bg-amber-50 rounded-xl border border-amber-200">
+<button type="button" id="quickUnlockAllBtn" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 active:scale-[0.99] text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center gap-1.5">
+<span>⚡</span> 一鍵急件解鎖（今天起所有日期皆可預訂）
+</button>
+<p class="text-[10px] text-amber-700 text-center mt-1">立刻解除提前一週、週一公休與特定公休限制，急單首選</p>
+</div>
+<!-- 🚫 週一公休開關 -->
+<div class="bg-stone-50 p-2.5 rounded-xl border border-stone-200 flex items-center justify-between">
+<div>
+<label for="settingDisableMonday" class="text-xs font-bold text-stone-700 flex items-center gap-1 cursor-pointer">
+<span>🚫</span> 阻擋週一固定公休
+</label>
+<p class="text-[10px] text-stone-500">取消勾選後即可開放客人選擇週一取貨</p>
+</div>
+<input type="checkbox" id="settingDisableMonday" checked class="w-4 h-4 text-amber-600 rounded cursor-pointer" />
+</div>
+<!-- 點選模式按鈕：可以預訂 vs 不可以預訂 -->
+<div class="space-y-1">
+<label class="block text-xs font-semibold text-stone-700">用按的設定日期（選取動作後點擊日曆）：</label>
+<div class="grid grid-cols-2 gap-2">
+<button type="button" id="brushOpenBtn" class="py-2 px-2 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-1.5 transition bg-emerald-50 border-emerald-500 text-emerald-800 shadow-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+按了設為【可以預訂】
+</button>
+<button type="button" id="brushClosedBtn" class="py-2 px-2 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-1.5 transition bg-white border-stone-200 text-stone-600 hover:bg-rose-50 hover:border-rose-300">
+<span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
+按了設為【不可預訂】
+</button>
+</div>
+</div>
+<!-- 月份切換導航 -->
+<div class="flex items-center justify-between bg-stone-50 p-2 rounded-xl border border-stone-200">
+<button type="button" id="prevMonthBtn" class="p-1 px-2.5 bg-white border border-stone-300 rounded-lg text-xs font-bold text-stone-700 hover:bg-stone-100">&lt; 上個月</button>
+<span id="calendarMonthTitle" class="text-xs font-bold text-stone-800">2026 年 10 月</span>
+<button type="button" id="nextMonthBtn" class="p-1 px-2.5 bg-white border border-stone-300 rounded-lg text-xs font-bold text-stone-700 hover:bg-stone-100">下個月 &gt;</button>
+</div>
+<!-- 星期表頭 -->
+<div class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-stone-500">
+<span class="text-rose-500">日</span>
+<span>一</span>
+<span>二</span>
+<span>三</span>
+<span>四</span>
+<span>五</span>
+<span class="text-amber-600">六</span>
+</div>
+<!-- 日曆格子本體（用按的） -->
+<div id="calendarGrid" class="grid grid-cols-7 gap-1 text-center select-none">
+<!-- JS 動態生成日期格子 -->
+</div>
+<!-- 快捷批次操作 -->
+<div class="pt-1 flex items-center justify-between text-[11px] text-stone-500 border-t border-stone-100">
+<div class="flex items-center gap-2">
+<span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-500 inline-block"></span>可訂</span>
+<span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-rose-400 inline-block"></span>休假/滿</span>
+</div>
+<div class="flex items-center gap-2">
+<button type="button" id="adminQuickAllOpenBtn" class="text-emerald-700 font-bold hover:underline">⚡ 本月全開</button>
+<button type="button" id="adminQuickMonCloseBtn" class="text-stone-600 hover:underline">🚫 週一全休</button>
+</div>
+</div>
+<!-- 儲存與恢復按鈕 -->
+<div class="grid grid-cols-2 gap-2 pt-2 border-t border-stone-100">
+<button type="button" id="adminResetDefaultBtn" class="w-full py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-semibold">恢復原廠預設</button>
+<button type="button" id="adminSaveSettingsBtn" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white rounded-xl text-xs font-bold shadow-md transition flex items-center justify-center gap-1">
+<span>☁️ 儲存並套用日曆</span>
+</button>
+</div>
+</div>
+</div>
+</div>
 <script>
-  // Google 協作平台嵌入背景色自動適配回報
-  (function() {
-    function getPageBackgroundColor() {
-      var docStyle = window.getComputedStyle(document.documentElement);
-      var color = docStyle.backgroundColor;
-      if ((color === 'rgba(0, 0, 0, 0)' || color === 'transparent') &&
-          docStyle.backgroundImage === 'none' && document.body) {
-        color = window.getComputedStyle(document.body).backgroundColor;
-      }
-      return color || '';
-    }
+const LINE_OA_ID = "@230fpemy";
+// Google 試算表（Google Apps Script 雲端同步網址）
+const GAS_CALENDAR_API = "https://script.google.com/macros/s/AKfycbzVxDkFO8UDZHUZYhiwGSFsTU4v6Ilbp0mgLXHEiXtDYYv_9p3epdF_y1IoWwSalqVx/exec";
 
-    var lastReportedColor = '';
-    function reportBackgroundColor() {
-      try {
-        var color = getPageBackgroundColor();
-        if (color === lastReportedColor) return;
-        lastReportedColor = color;
-        window.parent.postMessage({
-          type: 'ATARI_CODE_EMBED_BACKGROUND_COLOR',
-          backgroundColor: color
-        }, '*');
-      } catch (e) {}
-    }
+// 預設公休與預約規則（預設開放一個月、提前一週預約、週一固定公休）
+const DEFAULT_CLOSED_DATES = ["2026-10-27", "2026-11-24", "2026-12-01"];
+let defaultPreorderDays = 7;
+const currentHour = new Date().getHours();
+if (currentHour >= 18) {
+defaultPreorderDays += 1; // 超過傍晚 18:00 截單，需多加 1 天備料
+}
 
-    if (typeof MutationObserver !== 'undefined') {
-      var observer = new MutationObserver(reportBackgroundColor);
-      observer.observe(document.documentElement, {attributes: true});
-      if (document.body) {
-        observer.observe(document.body, {attributes: true});
-      }
-    }
-    window.addEventListener('load', reportBackgroundColor);
-    reportBackgroundColor();
-  })();
+// 狀態標準化工具（支援字串 'open'/'closed' 與布林值 true/false）
+function normalizeStatus(val) {
+if (val === true || val === 'open') return 'open';
+if (val === false || val === 'closed') return 'closed';
+return val;
+}
+
+// 阻擋週一固定公休開關狀態（預設開啟阻擋）
+let disableMondaySetting = true;
+try {
+const savedMon = localStorage.getItem("wuyi_cake_disable_monday_v1");
+if (savedMon !== null) {
+disableMondaySetting = JSON.parse(savedMon);
+}
+} catch(e) {}
+
+// 儲存店長自訂的日期狀態 (key: "YYYY-MM-DD", value: "open" | "closed")
+let calendarDateStatus = {};
+try {
+const saved = localStorage.getItem("wuyi_cake_date_status_v1");
+if (saved) {
+const parsed = JSON.parse(saved);
+for (const k in parsed) {
+calendarDateStatus[k] = normalizeStatus(parsed[k]);
+}
+}
+} catch(e) {}
+
+const standardFlavors = [
+"A 原味戚風＋藍莓果醬&藍莓＋豆乳奶凍＋原味奶油",
+"B 可可戚風＋當季水果＋Oreo巧克力脆＋Oreo鹹奶油",
+"C 伯爵戚風＋鹽之花焦糖核桃＋可可奶凍＋原味奶油",
+"D 焙茶戚風＋當季水果＋芝麻奶凍＋原味奶油",
+"E 檸檬戚風＋當季水果＋焙茶奶凍＋原味奶油",
+"F 可可戚風＋可可奶凍＋Oreo巧克力脆＋原味奶油"
+];
+const burgerFlavors = [
+"1. 原味戚風＋當季水果＋原味奶油",
+"2. 可可戚風＋Oreo巧克力脆＋原味奶油",
+"3. 伯爵戚風＋鹽之花焦糖核桃＋原味奶油",
+"4. 焙茶戚風＋當季水果＋原味奶油"
+];
+const sizeSelect = document.getElementById("size");
+const flavorSelect = document.getElementById("flavor");
+const flavorHint = document.getElementById("flavorHint");
+const candleCheckbox = document.getElementById("candleCheckbox");
+const candleField = document.getElementById("candleField");
+const candleDetail = document.getElementById("candleDetail");
+const noAddonsCheckbox = document.getElementById("noAddonsCheckbox");
+const otherAddons = document.querySelectorAll('input[name="addons"]:not(#noAddonsCheckbox)');
+
+// 加購項目互斥防呆
+noAddonsCheckbox.addEventListener("change", function() {
+if (this.checked) {
+otherAddons.forEach(cb => { cb.checked = false; });
+candleField.classList.add("hidden");
+candleDetail.value = "";
+}
+});
+otherAddons.forEach(cb => {
+cb.addEventListener("change", function() {
+if (this.checked && noAddonsCheckbox.checked) {
+noAddonsCheckbox.checked = false;
+}
+});
+});
+
+// 數字蠟燭展開
+candleCheckbox.addEventListener("change", function() {
+if (this.checked) {
+candleField.classList.remove("hidden");
+candleDetail.focus();
+} else {
+candleField.classList.add("hidden");
+candleDetail.value = "";
+}
+});
+
+// 格式化 YYYY-MM-DD
+const formatYMD = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+// 取得日期的預設開放狀態（若店長未手動點選覆蓋）
+function getDefaultStatus(dStr) {
+const parts = dStr.split('-');
+const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+const today = new Date();
+today.setHours(0,0,0,0);
+d.setHours(0,0,0,0);
+// 過去日期不可選
+if (d < today) return 'past';
+// 預設開放一個月範圍（超過一個月預設為 closed）
+const oneMonthAhead = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+if (d > oneMonthAhead) return 'closed';
+// 提前一週預約防呆（需提前 7 天）
+const diffTime = d.getTime() - today.getTime();
+const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
+if (diffDays < defaultPreorderDays) return 'closed';
+// 🚫 週一固定公休開關（勾選時阻擋週一，取消勾選則開放週一）
+if (disableMondaySetting && d.getDay() === 1) return 'closed';
+// 特定公休日
+if (DEFAULT_CLOSED_DATES.includes(dStr)) return 'closed';
+return 'open';
+}
+
+// 綜合判斷日期狀態
+function getDateStatus(dStr) {
+if (calendarDateStatus[dStr] !== undefined) {
+const s = normalizeStatus(calendarDateStatus[dStr]);
+if (s === 'open' || s === 'closed') return s;
+}
+return getDefaultStatus(dStr);
+}
+
+// 初始化與重建客人預訂日曆
+let fpInstance = null;
+function initCalendar() {
+const now = new Date();
+now.setHours(0,0,0,0);
+// 預設開放一個月日期
+let maxBookingDate = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
+// 若店長在一個月外有額外設定「可預訂」，自動延伸上限至該日期
+for (const dStr in calendarDateStatus) {
+if (normalizeStatus(calendarDateStatus[dStr]) === 'open') {
+const parts = dStr.split('-');
+const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+if (d > maxBookingDate) maxBookingDate = d;
+}
+}
+if (fpInstance) {
+fpInstance.destroy();
+}
+fpInstance = flatpickr("#date", {
+locale: {
+firstDayOfWeek: 0,
+weekdays: { shorthand: ["日", "一", "二", "三", "四", "五", "六"], longhand: ["週日", "週一", "週二", "週三", "週四", "週五", "週六"] },
+months: { shorthand: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"], longhand: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"] }
+},
+minDate: formatYMD(now),
+maxDate: formatYMD(maxBookingDate),
+dateFormat: "Y-m-d",
+disable: [
+function(date) {
+const dStr = formatYMD(date);
+const status = getDateStatus(dStr);
+return status !== 'open'; // 只要不是 open 一律禁止點選
+}
+]
+});
+}
+
+// 初次啟動日曆（先吃本機快取）
+initCalendar();
+
+// 尺寸連動口味
+sizeSelect.addEventListener("change", function() {
+const val = this.value;
+flavorSelect.innerHTML = '<option value="">請選擇口味</option>';
+if (val.includes("整模")) {
+flavorHint.classList.remove("hidden");
+flavorHint.innerText = "✨ 口味固定，當季水果為藍莓或綠葡萄";
+standardFlavors.forEach(item => {
+const opt = document.createElement("option");
+opt.value = item;
+opt.textContent = item;
+flavorSelect.appendChild(opt);
+});
+} else if (val.includes("漢堡盒")) {
+flavorHint.classList.remove("hidden");
+flavorHint.innerText = "✨ 口味固定，當季水果為藍莓或綠葡萄";
+burgerFlavors.forEach(item => {
+const opt = document.createElement("option");
+opt.value = item;
+opt.textContent = item;
+flavorSelect.appendChild(opt);
+});
+} else {
+flavorHint.classList.add("hidden");
+flavorSelect.innerHTML = '<option value="">先選尺寸</option>';
+}
+});
+
+// ============================================
+// 🎂 蛋糕圖案點擊 -> 密碼驗證 5151 -> 👑 店長模式
+// ============================================
+const adminCakeBtn = document.getElementById("adminCakeBtn");
+const adminModal = document.getElementById("adminModal");
+const adminStepAuth = document.getElementById("adminStepAuth");
+const adminStepPanel = document.getElementById("adminStepPanel");
+const adminPwdInput = document.getElementById("adminPwdInput");
+const adminPwdError = document.getElementById("adminPwdError");
+const adminVerifyBtn = document.getElementById("adminVerifyBtn");
+const adminCancelAuthBtn = document.getElementById("adminCancelAuthBtn");
+const adminCloseAuthBtn = document.getElementById("adminCloseAuthBtn");
+const adminClosePanelBtn = document.getElementById("adminClosePanelBtn");
+const quickUnlockAllBtn = document.getElementById("quickUnlockAllBtn");
+const settingDisableMonday = document.getElementById("settingDisableMonday");
+const brushOpenBtn = document.getElementById("brushOpenBtn");
+const brushClosedBtn = document.getElementById("brushClosedBtn");
+const prevMonthBtn = document.getElementById("prevMonthBtn");
+const nextMonthBtn = document.getElementById("nextMonthBtn");
+const calendarMonthTitle = document.getElementById("calendarMonthTitle");
+const calendarGrid = document.getElementById("calendarGrid");
+const adminQuickAllOpenBtn = document.getElementById("adminQuickAllOpenBtn");
+const adminQuickMonCloseBtn = document.getElementById("adminQuickMonCloseBtn");
+const adminSaveSettingsBtn = document.getElementById("adminSaveSettingsBtn");
+const adminResetDefaultBtn = document.getElementById("adminResetDefaultBtn");
+const cloudSyncStatus = document.getElementById("cloudSyncStatus");
+
+// 當前筆刷動作：'open'（可以預訂） 或 'closed'（不可預訂）
+let currentBrush = 'open';
+// 瀏覽的年月
+const todayObj = new Date();
+let viewYear = todayObj.getFullYear();
+let viewMonth = todayObj.getMonth();
+
+// 切換筆刷狀態樣式
+function setBrush(mode) {
+currentBrush = mode;
+if (mode === 'open') {
+brushOpenBtn.className = "py-2 px-2 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-1.5 transition bg-emerald-50 border-emerald-500 text-emerald-800 shadow-sm";
+brushClosedBtn.className = "py-2 px-2 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-1.5 transition bg-white border-stone-200 text-stone-600 hover:bg-rose-50 hover:border-rose-300";
+} else {
+brushClosedBtn.className = "py-2 px-2 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-1.5 transition bg-rose-50 border-rose-500 text-rose-800 shadow-sm";
+brushOpenBtn.className = "py-2 px-2 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-1.5 transition bg-white border-stone-200 text-stone-600 hover:bg-emerald-50 hover:border-emerald-300";
+}
+}
+brushOpenBtn.addEventListener("click", () => setBrush('open'));
+brushClosedBtn.addEventListener("click", () => setBrush('closed'));
+
+// 🚫 週一公休開關切換
+settingDisableMonday.addEventListener("change", function() {
+disableMondaySetting = this.checked;
+renderAdminCalendar();
+});
+
+// ⚡ 一鍵急件解鎖：立刻解除提前一週、週一公休與公休限制
+quickUnlockAllBtn.addEventListener("click", function() {
+disableMondaySetting = false;
+settingDisableMonday.checked = false;
+const today = new Date();
+today.setHours(0,0,0,0);
+const oneMonthAhead = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+// 將今天起到一個月內所有日期皆標記為 open
+for (let d = new Date(today); d <= oneMonthAhead; d.setDate(d.getDate() + 1)) {
+const dStr = formatYMD(d);
+calendarDateStatus[dStr] = 'open';
+}
+renderAdminCalendar();
+alert("🎉 已一鍵解鎖！今天起到未來一個月的所有日期皆可預訂（包含今天、明天、週一與公休日）。\n請點擊下方「儲存並套用日曆」同步至 Google 試算表！");
+});
+
+// 渲染店長日曆表格（用按的）
+function renderAdminCalendar() {
+calendarMonthTitle.innerText = `${viewYear} 年 ${viewMonth + 1} 月`;
+calendarGrid.innerHTML = "";
+const firstDayIndex = new Date(viewYear, viewMonth, 1).getDay();
+const totalDays = new Date(viewYear, viewMonth + 1, 0).getDate();
+const today = new Date();
+today.setHours(0,0,0,0);
+// 補上月初空白格
+for (let i = 0; i < firstDayIndex; i++) {
+const emptyCell = document.createElement("div");
+emptyCell.className = "h-11";
+calendarGrid.appendChild(emptyCell);
+}
+// 逐日渲染
+for (let day = 1; day <= totalDays; day++) {
+const dStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+const thisDate = new Date(viewYear, viewMonth, day);
+thisDate.setHours(0,0,0,0);
+const isPast = thisDate < today;
+const cell = document.createElement("div");
+cell.className = "h-11 rounded-lg flex flex-col items-center justify-center transition p-0.5";
+if (isPast) {
+cell.className += " bg-stone-100 text-stone-300 cursor-not-allowed border border-transparent";
+cell.innerHTML = `<span class="text-xs">${day}</span><span class="text-[9px] leading-none">-</span>`;
+} else {
+const status = getDateStatus(dStr);
+cell.dataset.date = dStr;
+if (status === 'open') {
+cell.className += " bg-emerald-50 text-emerald-800 border-2 border-emerald-400 font-bold hover:brightness-95 cursor-pointer shadow-xs";
+cell.innerHTML = `<span class="text-xs leading-tight">${day}</span><span class="text-[9px] text-emerald-600 leading-none font-medium">可訂</span>`;
+} else {
+cell.className += " bg-rose-50 text-rose-500 border border-rose-200 hover:brightness-95 cursor-pointer line-through";
+cell.innerHTML = `<span class="text-xs leading-tight">${day}</span><span class="text-[9px] text-rose-400 leading-none no-underline font-medium">休</span>`;
+}
+// 點擊事件：直接用按的切換狀態！
+cell.addEventListener("click", function() {
+const currentStatus = getDateStatus(dStr);
+if (currentStatus !== currentBrush) {
+calendarDateStatus[dStr] = currentBrush;
+} else {
+calendarDateStatus[dStr] = currentBrush === 'open' ? 'closed' : 'open';
+}
+renderAdminCalendar();
+});
+}
+calendarGrid.appendChild(cell);
+}
+}
+
+// 月份切換按鈕
+prevMonthBtn.addEventListener("click", function() {
+viewMonth--;
+if (viewMonth < 0) {
+viewMonth = 11;
+viewYear--;
+}
+renderAdminCalendar();
+});
+nextMonthBtn.addEventListener("click", function() {
+viewMonth++;
+if (viewMonth > 11) {
+viewMonth = 0;
+viewYear++;
+}
+renderAdminCalendar();
+});
+
+// 快捷操作：本月全開
+adminQuickAllOpenBtn.addEventListener("click", function() {
+const totalDays = new Date(viewYear, viewMonth + 1, 0).getDate();
+const today = new Date();
+today.setHours(0,0,0,0);
+for (let day = 1; day <= totalDays; day++) {
+const thisDate = new Date(viewYear, viewMonth, day);
+thisDate.setHours(0,0,0,0);
+if (thisDate >= today) {
+const dStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+calendarDateStatus[dStr] = 'open';
+}
+}
+renderAdminCalendar();
+});
+
+// 快捷操作：週一全休
+adminQuickMonCloseBtn.addEventListener("click", function() {
+const totalDays = new Date(viewYear, viewMonth + 1, 0).getDate();
+const today = new Date();
+today.setHours(0,0,0,0);
+for (let day = 1; day <= totalDays; day++) {
+const thisDate = new Date(viewYear, viewMonth, day);
+thisDate.setHours(0,0,0,0);
+if (thisDate >= today && thisDate.getDay() === 1) {
+const dStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+calendarDateStatus[dStr] = 'closed';
+}
+}
+renderAdminCalendar();
+});
+
+// 全形轉半形
+function toHalfWidth(str) {
+return (str || "").replace(/[０-９]/g, function(c) {
+return String.fromCharCode(c.charCodeAt(0) - 0xfee0);
+}).trim();
+}
+
+// 點擊蛋糕圖案開啟彈窗
+adminCakeBtn.addEventListener("click", function() {
+adminModal.classList.remove("hidden");
+adminStepAuth.classList.remove("hidden");
+adminStepPanel.classList.add("hidden");
+adminPwdError.classList.add("hidden");
+adminPwdInput.value = "";
+setTimeout(() => adminPwdInput.focus(), 100);
+});
+
+// 關閉彈窗
+function closeAdminModal() {
+adminModal.classList.add("hidden");
+adminPwdInput.value = "";
+adminPwdError.classList.add("hidden");
+}
+adminCancelAuthBtn.addEventListener("click", closeAdminModal);
+adminCloseAuthBtn.addEventListener("click", closeAdminModal);
+adminClosePanelBtn.addEventListener("click", closeAdminModal);
+
+// 驗證密碼 5151
+function verifyPassword() {
+const pwd = toHalfWidth(adminPwdInput.value);
+if (pwd === "5151") {
+adminStepAuth.classList.add("hidden");
+adminStepPanel.classList.remove("hidden");
+settingDisableMonday.checked = disableMondaySetting;
+viewYear = todayObj.getFullYear();
+viewMonth = todayObj.getMonth();
+setBrush('open');
+renderAdminCalendar();
+} else {
+adminPwdError.classList.remove("hidden");
+adminPwdInput.focus();
+adminPwdInput.select();
+}
+}
+adminVerifyBtn.addEventListener("click", verifyPassword);
+adminPwdInput.addEventListener("keydown", function(e) {
+if (e.key === "Enter") {
+e.preventDefault();
+verifyPassword();
+}
+});
+
+// ============================================
+// ☁️ Google 試算表 (Google Apps Script) 雲端連線與同步
+// ============================================
+const checkCloudSyncBtn = document.getElementById("checkCloudSyncBtn");
+
+// 更新右上角簡潔狀態標籤
+function updateSyncStatusUI(status) {
+if (!checkCloudSyncBtn) return;
+if (status === "checking") {
+checkCloudSyncBtn.disabled = true;
+checkCloudSyncBtn.innerHTML = "🔄 檢測中";
+checkCloudSyncBtn.className = "inline-flex items-center text-[10px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200 transition duration-150 select-none cursor-pointer";
+} else if (status === "online") {
+checkCloudSyncBtn.disabled = false;
+checkCloudSyncBtn.innerHTML = "🟢 連線正常";
+checkCloudSyncBtn.className = "inline-flex items-center text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200 transition duration-150 select-none cursor-pointer hover:bg-emerald-100";
+} else if (status === "offline") {
+checkCloudSyncBtn.disabled = false;
+checkCloudSyncBtn.innerHTML = "🔴 連線中斷";
+checkCloudSyncBtn.className = "inline-flex items-center text-[10px] bg-rose-50 text-rose-600 px-2 py-0.5 rounded-full border border-rose-200 transition duration-150 select-none cursor-pointer hover:bg-rose-100";
+}
+}
+
+// 檢查 Google 試算表連線狀態與同步日曆
+async function checkCloudConnection(isManualClick = false) {
+updateSyncStatusUI("checking");
+if (cloudSyncStatus) {
+cloudSyncStatus.innerHTML = '<span class="animate-spin inline-block mr-1">🔄</span>同步中...';
+cloudSyncStatus.className = "text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-medium flex items-center";
+}
+
+try {
+const res = await fetch(GAS_CALENDAR_API + "?t=" + Date.now(), { method: "GET" });
+if (!res.ok) throw new Error("HTTP " + res.status);
+const json = await res.json();
+if (json && (json.status === "success" || json.data)) {
+const data = json.data || json;
+if (typeof data.disableMonday === "boolean") {
+disableMondaySetting = data.disableMonday;
+if (settingDisableMonday) settingDisableMonday.checked = disableMondaySetting;
+localStorage.setItem("wuyi_cake_disable_monday_v1", JSON.stringify(disableMondaySetting));
+}
+if (data.calendarDateStatus && typeof data.calendarDateStatus === "object") {
+for (const k in data.calendarDateStatus) {
+calendarDateStatus[k] = normalizeStatus(data.calendarDateStatus[k]);
+}
+}
+if (Array.isArray(data.closedDates)) {
+data.closedDates.forEach(d => {
+if (!calendarDateStatus[d]) calendarDateStatus[d] = 'closed';
+});
+}
+if (Array.isArray(data.specialOpenDates)) {
+data.specialOpenDates.forEach(d => {
+if (!calendarDateStatus[d]) calendarDateStatus[d] = 'open';
+});
+}
+localStorage.setItem("wuyi_cake_date_status_v1", JSON.stringify(calendarDateStatus));
+initCalendar();
+if (!adminModal.classList.contains("hidden") && !adminStepPanel.classList.contains("hidden")) {
+renderAdminCalendar();
+}
+
+updateSyncStatusUI("online");
+if (cloudSyncStatus) {
+cloudSyncStatus.innerHTML = '☁️ Google 試算表已連線';
+cloudSyncStatus.className = "text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-medium flex items-center";
+}
+
+if (isManualClick) {
+alert("🟢 Google 試算表連線正常！最新日曆已同步。");
+}
+} else {
+throw new Error("試算表回傳格式異常");
+}
+} catch (err) {
+console.warn("無法取得 Google 試算表日曆資料，使用本機快取:", err);
+updateSyncStatusUI("offline");
+if (cloudSyncStatus) {
+cloudSyncStatus.innerHTML = '☁️ 使用本機快取 (離線)';
+cloudSyncStatus.className = "text-[10px] bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full font-medium flex items-center";
+}
+if (isManualClick) {
+alert("🔴 Google 試算表連線中斷，目前使用本機暫存日曆。");
+}
+}
+}
+
+// 點擊右上角按鈕觸發手動連線測試
+if (checkCloudSyncBtn) {
+checkCloudSyncBtn.addEventListener("click", () => checkCloudConnection(true));
+}
+
+// 儲存並套用日曆（捨棄 TOKEN，改用 Google 試算表同步）
+adminSaveSettingsBtn.addEventListener("click", async function() {
+const btn = adminSaveSettingsBtn;
+const originalHtml = btn.innerHTML;
+btn.disabled = true;
+btn.innerHTML = '<span>☁️ 雲端同步儲存中...</span>';
+
+// 整理並正規化日期狀態
+const cleanStatus = {};
+for (const k in calendarDateStatus) {
+cleanStatus[k] = normalizeStatus(calendarDateStatus[k]);
+}
+
+const payload = {
+updatedAt: new Date().toISOString(),
+disableMonday: disableMondaySetting,
+calendarDateStatus: cleanStatus
+};
+
+// 本機先快取
+try {
+localStorage.setItem("wuyi_cake_date_status_v1", JSON.stringify(cleanStatus));
+localStorage.setItem("wuyi_cake_disable_monday_v1", JSON.stringify(disableMondaySetting));
+} catch(e) {}
+
+try {
+const res = await fetch(GAS_CALENDAR_API, {
+method: "POST",
+headers: { "Content-Type": "text/plain;charset=utf-8" },
+body: JSON.stringify(payload)
+});
+initCalendar();
+updateSyncStatusUI("online");
+closeAdminModal();
+setTimeout(() => {
+alert("✅ 日期開放設定已成功儲存並同步至 Google 雲端試算表！\n客人現在即可預訂您最新開放的日期。");
+if (fpInstance) fpInstance.open();
+}, 150);
+} catch (err) {
+console.error("同步至 Google 試算表失敗:", err);
+initCalendar();
+updateSyncStatusUI("offline");
+closeAdminModal();
+setTimeout(() => {
+alert("⚠️ 日期已先儲存於本機！\n（雲端同步可能有短暫網路延遲，請稍後確認網路連線）");
+if (fpInstance) fpInstance.open();
+}, 150);
+} finally {
+btn.disabled = false;
+btn.innerHTML = originalHtml;
+}
+});
+
+// 恢復原廠預設值
+adminResetDefaultBtn.addEventListener("click", async function() {
+if (!confirm("確定要將所有日期設定恢復為原廠預設值嗎？\n（預設開放一個月、需提前一週預約、週一固定公休）")) {
+return;
+}
+const btn = adminResetDefaultBtn;
+const originalText = btn.innerText;
+btn.disabled = true;
+btn.innerText = "重設中...";
+
+calendarDateStatus = {};
+disableMondaySetting = true;
+settingDisableMonday.checked = true;
+
+try {
+localStorage.removeItem("wuyi_cake_date_status_v1");
+localStorage.removeItem("wuyi_cake_disable_monday_v1");
+} catch(e) {}
+
+const payload = {
+updatedAt: new Date().toISOString(),
+disableMonday: true,
+calendarDateStatus: {}
+};
+
+try {
+await fetch(GAS_CALENDAR_API, {
+method: "POST",
+headers: { "Content-Type": "text/plain;charset=utf-8" },
+body: JSON.stringify(payload)
+});
+} catch(e) {
+console.warn("重設雲端失敗:", e);
+} finally {
+btn.disabled = false;
+btn.innerText = originalText;
+initCalendar();
+updateSyncStatusUI("online");
+renderAdminCalendar();
+closeAdminModal();
+alert("🔄 已成功恢復為預設規則，並同步重設至 Google 雲端試算表！");
+}
+});
+
+// 頁面載入後，非同步自動自 Google 試算表檢查連線並拉取最新日期設定
+checkCloudConnection(false);
+
+// ============================================
+// 表單送出前「全面嚴格驗證」
+// ============================================
+document.getElementById("cakeOrderForm").addEventListener("submit", function(e) {
+e.preventDefault();
+// 1. 蠟燭必填歲數驗證
+if (candleCheckbox.checked && candleDetail.value.trim() === "") {
+alert("⚠️ 您有加購數字蠟燭，請填寫需要的歲數（或問號）喔！若不需要請取消勾選蠟燭。");
+candleDetail.focus();
+return;
+}
+// 2. 手機號碼格式驗證（必須為 09 開頭共 10 碼）
+const phoneInput = document.getElementById("phone");
+const cleanPhone = phoneInput.value.replace(/[-\s]/g, "");
+const phoneRegex = /^09\d{8}$/;
+if (!phoneRegex.test(cleanPhone)) {
+alert("⚠️ 請填寫正確的手機號碼（共 10 碼，例如：0912345678）！");
+phoneInput.focus();
+return;
+}
+// 3. 英文題字中文字檢查防呆
+const letteringInput = document.getElementById("lettering");
+const letteringVal = letteringInput.value.trim();
+if (/[\u4e00-\u9fa5]/.test(letteringVal)) {
+alert("⚠️ 提醒您：題字目前僅提供英文（最多2-3個字，如 HBD），暫無提供中文題字喔！請修改後再送出。");
+letteringInput.focus();
+return;
+}
+// 處理加購項目
+let selectedAddons = Array.from(document.querySelectorAll('input[name="addons"]:checked')).map(el => el.value);
+if (candleCheckbox.checked && candleDetail.value.trim() !== "") {
+selectedAddons = selectedAddons.map(item => item.includes("數字蠟燭") ? `數字蠟燭 $30/支 (${candleDetail.value.trim()})` : item);
+}
+const addonsText = selectedAddons.length > 0 ? selectedAddons.join("、") : "無";
+const cakeColor = document.getElementById("cakeColor").value.trim() || "無 / LINE討論";
+const lettering = letteringVal || "無";
+const customNote = document.getElementById("customNote").value.trim() || "無";
+const orderData = {
+cakeColor: cakeColor,
+lettering: lettering,
+customNote: customNote,
+size: document.getElementById("size").value,
+flavor: document.getElementById("flavor").value,
+addons: addonsText,
+date: document.getElementById("date").value,
+time: document.getElementById("time").value,
+location: "台南市中西區友愛街９３號",
+lineName: document.getElementById("lineName").value.trim(),
+name: document.getElementById("name").value.trim(),
+phone: cleanPhone
+};
+const message =
+`【蛋糕訂購資訊】
+蛋糕體顏色：${orderData.cakeColor}
+英文題字：${orderData.lettering}
+其他客製需求：${orderData.customNote}
+
+蛋糕尺寸：${orderData.size}
+蛋糕口味：${orderData.flavor}
+
+需加購：${orderData.addons}
+
+
+取貨日期：${orderData.date}
+取貨時間：${orderData.time}
+自取地點：${orderData.location}
+
+訂購人 LINE 名稱：${orderData.lineName}
+訂購人姓名：${orderData.name}
+訂購人電話：${orderData.phone}
+
+圖片提醒：已確認送出後傳送參考圖片報價`;
+
+// 自動複製到剪貼簿備用
+if (navigator.clipboard && navigator.clipboard.writeText) {
+navigator.clipboard.writeText(message).catch(() => {});
+}
+
+// 支援覆蓋畫面的複製按鈕
+const copyBtn = document.getElementById("copyOrderBtn");
+const copyBtnText = document.getElementById("copyOrderBtnText");
+if (copyBtn) {
+copyBtn.onclick = function() {
+if (navigator.clipboard && navigator.clipboard.writeText) {
+navigator.clipboard.writeText(message).then(() => {
+copyBtnText.innerText = "已成功複製訂購文字！";
+setTimeout(() => { copyBtnText.innerText = "點此手動複製訂購內容"; }, 2000);
+}).catch(() => {
+alert("複製失敗，請手動選取文字");
+});
+}
+};
+}
+
+const encodedId = encodeURIComponent(LINE_OA_ID);
+const encodedMsg = encodeURIComponent(message);
+const lineUrl = `https://line.me/R/oaMessage/${encodedId}/?${encodedMsg}`;
+// 顯示覆蓋畫面並提醒按發送
+document.getElementById("cakeOrderForm").classList.add("hidden");
+const overlay = document.getElementById("successOverlay");
+overlay.classList.remove("hidden");
+document.getElementById("lineManualBtn").href = lineUrl;
+// 跳轉 LINE
+const jumpLink = document.createElement("a");
+jumpLink.href = lineUrl;
+jumpLink.target = "_blank";
+jumpLink.rel = "noopener noreferrer";
+document.body.appendChild(jumpLink);
+jumpLink.click();
+jumpLink.remove();
+});
 </script>
-
 </body>
 </html>
